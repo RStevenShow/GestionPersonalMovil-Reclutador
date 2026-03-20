@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Menú principal</title>
+
+
+    <!-- BOOTSTRAP -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <!-- ICONOS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+
+    <!-- CHART -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <link rel="stylesheet" href="app.css">
+
+</head>
+
+
+
+<body class="pantalla-menu">
+
+
+
+    <!-- ================= ENCABEZADO ================= -->
+
+    <header class="encabezado-menu">
+
+        <div class="container">
+
+            <div class="d-flex justify-content-between">
+
+                <h4>
+
+                    <i class="bi bi-people"></i>
+
+                    <span id="nombreApp">MarkNica</span>
+
+                </h4>
+
+                <i class="bi bi-shield-lock"></i>
+
+            </div>
+
+
+
+            <div class="row mt-3 text-center">
+
+                <div class="col-4">
+
+                    <div class="estadistica">
+
+                        <span id="datoCandidatos">0</span>
+
+                        <br>
+
+                        <small>Candidatos</small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-4">
+
+                    <div class="estadistica">
+
+                        <span id="datoEntrevistas">0</span>
+
+                        <br>
+
+                        <small>Entrevistas</small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-4">
+
+                    <div class="estadistica">
+
+                        <span id="datoMatch">0%</span>
+
+                        <br>
+
+                        <small>Match IA</small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- ================= CONTENIDO ================= -->
+
+    <main class="container mt-4">
+
+
+
+        <h5 id="tituloAcciones">
+
+            Acciones inmediatas
+
+        </h5>
+
+
+
+        <div id="accion1" class="tarjeta-accion prioridad-alta p-3 mb-3">
+
+            Cargando...
+
+        </div>
+
+
+
+        <div id="accion2" class="tarjeta-accion prioridad-media p-3 mb-3">
+
+            Cargando...
+
+        </div>
+
+
+
+        <!-- ================= TARJETA GRAFICO ================= -->
+
+        <div class="card mt-4">
+
+            <div class="card-body">
+
+                <h5 id="tituloGrafico">
+
+                    Estado del proceso
+
+                </h5>
+
+                <canvas id="graficoProceso"></canvas>
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- ================= BARRA ================= -->
+
+    <nav class="barra-inferior-pro">
+
+        <a href="menu.html" class="link-menu activo">
+
+            <i class="bi bi-house"></i>
+
+            <span>Inicio</span>
+
+        </a>
+
+
+        <a href="vacantes.html" class="link-menu">
+
+            <i class="bi bi-briefcase"></i>
+
+            <span>Vacantes</span>
+
+        </a>
+
+
+        <a href="mensaje.html" class="link-menu">
+
+            <i class="bi bi-chat"></i>
+
+            <span>Mensajes</span>
+
+        </a>
+
+
+        <a href="agenda.html" class="link-menu">
+
+            <i class="bi bi-calendar"></i>
+
+            <span>Agenda</span>
+
+        </a>
+
+
+        <a href="perfil.html" class="link-menu">
+
+            <i class="bi bi-person"></i>
+
+            <span>Perfil</span>
+
+        </a>
+
+    </nav>
+
+
+
+    <!-- ================= SCRIPT ================= -->
+
+    <script>
+
+
+        /* ================= DATOS ================= */
+        /* luego vendran del backend */
+
+        let menuData = {
+
+            appNombre: "MarkNica",
+
+            candidatos: 8,
+            entrevistas: 5,
+            match: 76,
+
+            acciones: [
+
+                "Tienes 3 entrevistas hoy",
+                "5 candidatos sin revisar"
+
+            ],
+
+            proceso: {
+
+                screening: 4,
+                entrevistas: 3,
+                oferta: 2,
+                contratados: 1
+
+            }
+
+        }
+
+
+
+        /* ================= CARGAR DATOS ================= */
+
+        function cargarMenu(data) {
+
+            document.getElementById("nombreApp").textContent =
+                data.appNombre
+
+
+            document.getElementById("datoCandidatos").textContent =
+                data.candidatos
+
+
+            document.getElementById("datoEntrevistas").textContent =
+                data.entrevistas
+
+
+            document.getElementById("datoMatch").textContent =
+                data.match + "%"
+
+
+            document.getElementById("accion1").textContent =
+                data.acciones[0]
+
+
+            document.getElementById("accion2").textContent =
+                data.acciones[1]
+
+
+            crearGrafico(data.proceso)
+
+        }
+
+
+
+        /* ================= GRAFICO ================= */
+
+        function crearGrafico(proceso) {
+
+            const ctx =
+                document.getElementById("graficoProceso")
+
+
+            new Chart(ctx, {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels: [
+
+                        "Screening",
+                        "Entrevistas",
+                        "Oferta",
+                        "Contratados"
+
+                    ],
+
+                    datasets: [
+
+                        {
+
+                            data: [
+
+                                proceso.screening,
+                                proceso.entrevistas,
+                                proceso.oferta,
+                                proceso.contratados
+
+                            ],
+
+                            backgroundColor: [
+
+                                "#fbbf24",
+                                "#60a5fa",
+                                "#a78bfa",
+                                "#34d399"
+
+                            ]
+
+                        }
+
+                    ]
+
+                }
+
+            })
+
+        }
+
+
+
+        /* ================= INICIO ================= */
+
+        cargarMenu(menuData)
+
+
+
+        /* ================= FUTURO BACKEND ================= */
+
+        // fetch("/api/menu")
+        // .then(r => r.json())
+        // .then(data => {
+        //     cargarMenu(data)
+        // })
+
+
+    </script>
+    <script>
+
+const links = document.querySelectorAll(".link-menu")
+
+links.forEach(link => {
+
+if (link.href === window.location.href) {
+
+link.classList.add("activo")
+
+}
+
+})
+
+</script>
+
+
+</body>
+
+</html>

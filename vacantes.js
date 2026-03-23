@@ -1,51 +1,64 @@
 /* =====================================================
-   LOGICA DE VACANTES - CONEXIÓN CON FASTAPI & POSTGRES
+   LOGICA DE GESTIÓN DE VACANTES - MARKNICA
 ===================================================== */
 
-// Configuración de la URL de tu laptop (Cambiar por la de la nube en el futuro)
 const API_URL = "http://localhost:8000"; 
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Cargar vacantes al iniciar
-    obtenerVacantes();
+// Variables para los modales
+let modalCargando, modalExito, modalError;
 
-    // 2. Configurar el filtro de búsqueda en tiempo real
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicialización de modales
+    modalCargando = new bootstrap.Modal(document.getElementById('modal-cargando'));
+    modalExito = new bootstrap.Modal(document.getElementById('modal-exito'));
+    modalError = new bootstrap.Modal(document.getElementById('modal-error'));
+
+    // Carga inicial
+    obtenerVacantes();
+    
+    // Buscador en tiempo real
     document.getElementById('searchInput').addEventListener('input', filtrarVacantes);
+
+    // ESCUCHADOR ESPECIAL: Limpiar el fondo negro cuando se cierre el modal de éxito
+    const elExito = document.getElementById('modal-exito');
+    elExito.addEventListener('hidden.bs.modal', removerFondoOscuro);
 });
 
-// --- 1. OBTENER DATOS DE LA LAPTOP ---
+/**
+ * Obtiene las vacantes del servidor
+ */
 async function obtenerVacantes() {
     try {
         const response = await fetch(`${API_URL}/offers/`);
-        if (!response.ok) throw new Error("Error en la respuesta del servidor");
+        if (!response.ok) throw new Error("Error en el servidor");
         
         const vacantes = await response.json();
         renderizarVacantes(vacantes);
     } catch (error) {
-        console.error("Error al conectar:", error);
+        console.error("Error:", error);
         document.getElementById('vacantes-list').innerHTML = `
-            <div class="alert alert-danger mx-3 small text-center">
-                <i class="bi bi-wifi-off d-block fs-3 mb-2"></i>
-                No se pudo conectar con el servidor local.<br>
-                Asegúrate de que FastAPI esté corriendo en tu laptop.
+            <div class="text-center p-5 opacity-50">
+                <i class="bi bi-cloud-slash fs-1 text-danger"></i>
+                <p>No se pudo conectar con el servidor.</p>
             </div>`;
     }
 }
 
-// --- 2. RENDERIZAR TARJETAS DINÁMICAMENTE ---
+/**
+ * Crea las tarjetas de vacantes en el HTML
+ */
 function renderizarVacantes(vacantes) {
     const contenedor = document.getElementById('vacantes-list');
-    contenedor.innerHTML = '';
+    contenedor.innerHTML = ''; 
 
     if (vacantes.length === 0) {
-        contenedor.innerHTML = '<p class="text-center text-muted">No hay vacantes registradas.</p>';
+        contenedor.innerHTML = '<p class="text-center text-muted py-5">No hay vacantes registradas.</p>';
         return;
     }
 
     vacantes.forEach(v => {
         const tarjeta = document.createElement('div');
-        // Usamos la prioridad para el color del borde izquierdo
-        tarjeta.className = `job-card shadow-sm prioridad-${v.priority} fade`;
+        tarjeta.className = `job-card shadow-sm prioridad-${v.priority || 'medium'}`;
         
         tarjeta.innerHTML = `
             <div class="d-flex justify-content-between align-items-start mb-2">
@@ -54,32 +67,25 @@ function renderizarVacantes(vacantes) {
                     <small class="text-muted"><i class="bi bi-geo-alt"></i> ${v.location || 'Remoto'}</small>
                 </div>
                 <span class="badge bg-primary-subtle text-primary border-0 small">
-                    ${v.salary_range ? v.salary_range : 'S/N'}
+                    ${v.salary_range || 'Privado'}
                 </span>
             </div>
-            
-            <div class="d-flex gap-3 mb-1 small text-secondary">
-                <span><i class="bi bi-person-workspace text-primary"></i> ${v.experience_years} años exp.</span>
+            <div class="d-flex gap-3 mb-2 small text-secondary">
+                <span><i class="bi bi-briefcase text-primary"></i> ${v.experience_years} años exp.</span>
                 <span><i class="bi bi-people"></i> 0 Aplicantes</span>
             </div>
-
-            <p class="text-muted small mb-0 text-truncate" style="max-width: 250px;">
-                ${v.description_original}
-            </p>
+            <p class="text-muted small mb-0 text-truncate">${v.description_original}</p>
         `;
         contenedor.appendChild(tarjeta);
     });
 
-    // Actualizar los números de las estadísticas del Header
     actualizarEstadisticas(vacantes);
 }
 
-// --- 3. CREAR NUEVA VACANTE (POST A LAPTOP) ---
+/**
+ * Lógica principal para crear la vacante
+ */
 async function crearVacante() {
-    const boton = event.target;
-    const textoOriginal = boton.innerHTML;
-
-    // Captura de todos los campos según tu SQLModel
     const datosVacante = {
         title: document.getElementById('title').value,
         description_original: document.getElementById('description').value,
@@ -90,15 +96,14 @@ async function crearVacante() {
         priority: document.getElementById('priority').value || "medium"
     };
 
-    // Validación básica
     if (!datosVacante.title || !datosVacante.description_original) {
-        alert("Los campos con * son obligatorios.");
+        document.getElementById('mensaje-error-texto').innerText = "Llena los campos obligatorios (*).";
+        modalError.show();
         return;
     }
 
-    // UI: Estado de carga
-    boton.disabled = true;
-    boton.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Analizando con IA...`;
+    // 1. Mostrar carga
+    modalCargando.show();
 
     try {
         const response = await fetch(`${API_URL}/offers/`, {
@@ -107,46 +112,61 @@ async function crearVacante() {
             body: JSON.stringify(datosVacante)
         });
 
+        // 2. Ocultar carga inmediatamente después de la respuesta
+        modalCargando.hide();
+
         if (response.ok) {
-            alert("¡Éxito! Vacante enviada a IA y guardada en PostgreSQL.");
-            
-            // Cerrar modal y limpiar formulario
-            const modalElement = document.getElementById('modalNuevaVacante');
-            const modalBus = bootstrap.Modal.getInstance(modalElement);
-            modalBus.hide();
+            // 3. Cerrar el modal del formulario
+            const modalForm = bootstrap.Modal.getInstance(document.getElementById('modalNuevaVacante'));
+            if (modalForm) modalForm.hide();
+
+            // 4. LIMPIEZA CRÍTICA: Quitamos el fondo negro antes de mostrar el éxito
+            removerFondoOscuro();
+
+            // 5. Mostrar éxito
+            setTimeout(() => {
+                document.getElementById('mensaje-exito-texto').innerText = "Vacante creada correctamente.";
+                modalExito.show();
+            }, 300); // Pequeño delay para que Bootstrap respire
+
             document.getElementById('formVacante').reset();
-            
-            // Recargar lista
             obtenerVacantes();
         } else {
-            alert("Hubo un problema al guardar la vacante.");
+            const err = await response.json();
+            document.getElementById('mensaje-error-texto').innerText = "Error: " + (err.detail || "No guardado");
+            modalError.show();
         }
     } catch (error) {
-        alert("Error crítico de conexión.");
-        console.error(error);
-    } finally {
-        boton.disabled = false;
-        boton.innerHTML = textoOriginal;
+        modalCargando.hide();
+        removerFondoOscuro();
+        document.getElementById('mensaje-error-texto').innerText = "Error de red.";
+        modalError.show();
     }
 }
 
-// --- 4. FUNCIONES AUXILIARES ---
+/**
+ * FUNCIÓN DE LIMPIEZA FORZOSA (Solución al fondo negro)
+ */
+function removerFondoOscuro() {
+    // Elimina la clase que bloquea el scroll
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+
+    // Elimina cualquier capa oscura sobrante
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(b => b.remove());
+}
+
 function actualizarEstadisticas(vacantes) {
     document.getElementById('stat-abiertas').innerText = vacantes.length;
-    // Aquí puedes sumar candidatos de las relaciones en el futuro
-    document.getElementById('stat-candidatos').innerText = "0"; 
 }
 
 function filtrarVacantes() {
     const texto = document.getElementById('searchInput').value.toLowerCase();
     const tarjetas = document.querySelectorAll('.job-card');
-
     tarjetas.forEach(t => {
         const titulo = t.querySelector('h3').innerText.toLowerCase();
-        if (titulo.includes(texto)) {
-            t.style.display = "block";
-        } else {
-            t.style.display = "none";
-        }
+        t.style.display = titulo.includes(texto) ? "block" : "none";
     });
 }

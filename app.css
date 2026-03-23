@@ -157,6 +157,13 @@ body{
 
 }
 
+#form-login {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Espacio uniforme entre grupos de input */
+}
+
 .grupo-input{
 
     margin-bottom:1.2rem;

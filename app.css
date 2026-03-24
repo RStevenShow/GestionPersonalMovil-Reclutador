@@ -972,3 +972,115 @@ SCROLL SUAVE EN MODAL
     background: #cbd5e1;
     border-radius: 10px;
 }
+
+/* =====================================================
+   ESTILOS ESPECÍFICOS DEL PERFIL
+===================================================== */
+
+/* Contenedores redondeados estilo iOS */
+.rounded-4 {
+    border-radius: 1.2rem !important;
+}
+
+/* Mini tarjetas de vacantes dentro del perfil */
+.mini-card-vacante {
+    background: white;
+    border-radius: 1rem;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.mini-card-vacante h6 {
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+    color: #1f2937;
+}
+
+/* Botón de borrar vacante (Rojizo y minimalista) */
+.btn-borrar-mini {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: none;
+    background: #fff1f2;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.btn-borrar-mini:active {
+    background: #ef4444;
+    color: white;
+    transform: scale(0.9);
+}
+
+/* Foto de perfil con sombra */
+.encabezado-menu img {
+    background: white;
+}
+
+.list-group-item {
+    background: white;
+}
+#confirm-container, #confirm-baja-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6000; /* Por encima de todo */
+}
+
+/* Capa oscura de fondo */
+.sheet-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 5000;
+    backdrop-filter: blur(4px);
+}
+
+/* La ventana que sube */
+.bottom-sheet {
+    position: fixed;
+    bottom: -100%; /* Empieza escondida abajo */
+    left: 0;
+    width: 100%;
+    background: white;
+    border-radius: 2rem 2rem 0 0;
+    z-index: 5001;
+    transition: bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+}
+
+/* Cuando se activa */
+.bottom-sheet.active {
+    bottom: 0;
+}
+
+/* Rayita gris para "arrastrar" (estilo iPhone) */
+.sheet-handle {
+    width: 40px;
+    height: 5px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    margin: 10px auto;
+}
+
+.sheet-header {
+    text-align: center;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 10px;
+}

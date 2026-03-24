@@ -1,39 +1,60 @@
 /* =====================================================
-   LOGICA DE GESTIÓN DE VACANTES - MARKNICA
+   VACANTES.JS - GESTIÓN DE VACANTES (SISTEMA PRO)
+   Proyecto: MarkNica Recruiting AI
+   Explicación: Este archivo maneja la lista de trabajos
+   y la creación de nuevos puestos usando IA.
 ===================================================== */
 
-const API_URL = "http://localhost:8000"; 
+const API_URL = "http://localhost:8000";
 
-// Variables para los modales
-let modalCargando, modalExito, modalError;
-
+// 1. INICIALIZACIÓN: Se ejecuta cuando la página carga
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicialización de modales
-    modalCargando = new bootstrap.Modal(document.getElementById('modal-cargando'));
-    modalExito = new bootstrap.Modal(document.getElementById('modal-exito'));
-    modalError = new bootstrap.Modal(document.getElementById('modal-error'));
-
-    // Carga inicial
+    // Pedimos las vacantes guardadas al servidor
     obtenerVacantes();
     
-    // Buscador en tiempo real
-    document.getElementById('searchInput').addEventListener('input', filtrarVacantes);
-
-    // ESCUCHADOR ESPECIAL: Limpiar el fondo negro cuando se cierre el modal de éxito
-    const elExito = document.getElementById('modal-exito');
-    elExito.addEventListener('hidden.bs.modal', removerFondoOscuro);
+    // Escuchamos lo que el usuario escribe en la lupa de buscar
+    const inputBusqueda = document.getElementById('searchInput');
+    if (inputBusqueda) {
+        inputBusqueda.addEventListener('input', filtrarVacantes);
+    }
 });
 
 /**
- * Obtiene las vacantes del servidor
+ * FUNCIÓN: Obtener vacantes del servidor
+ * Explicación: Trae la lista de trabajos usando el Token de seguridad.
  */
 async function obtenerVacantes() {
+    const token = localStorage.getItem('token'); 
+
+    // Si no hay token, el usuario no está logueado
+    if (!token) {
+        window.location.href = "Login.html";
+        return;
+    }
+
     try {
-        const response = await fetch(`${API_URL}/offers/`);
+        const response = await fetch(`${API_URL}/offers/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, 
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Si el token expiró (401), lo mandamos a loguearse de nuevo
+        if (response.status === 401) {
+            localStorage.removeItem('token');
+            window.location.href = "Login.html";
+            return;
+        }
+
         if (!response.ok) throw new Error("Error en el servidor");
         
         const vacantes = await response.json();
+        
+        // Dibujamos las tarjetas en pantalla
         renderizarVacantes(vacantes);
+
     } catch (error) {
         console.error("Error:", error);
         document.getElementById('vacantes-list').innerHTML = `
@@ -45,10 +66,13 @@ async function obtenerVacantes() {
 }
 
 /**
- * Crea las tarjetas de vacantes en el HTML
+ * FUNCIÓN: Crear las tarjetas visuales
+ * Explicación: Convierte los datos del servidor en cuadritos HTML.
  */
 function renderizarVacantes(vacantes) {
     const contenedor = document.getElementById('vacantes-list');
+    if (!contenedor) return;
+
     contenedor.innerHTML = ''; 
 
     if (vacantes.length === 0) {
@@ -79,13 +103,20 @@ function renderizarVacantes(vacantes) {
         contenedor.appendChild(tarjeta);
     });
 
-    actualizarEstadisticas(vacantes);
+    // Actualizamos el contador de la parte superior
+    const statAbiertas = document.getElementById('stat-abiertas');
+    if (statAbiertas) statAbiertas.innerText = vacantes.length;
 }
 
 /**
- * Lógica principal para crear la vacante
+ * FUNCIÓN: Crear una nueva vacante
+ * Explicación: Envía los datos del formulario al servidor y procesa con IA.
  */
 async function crearVacante() {
+    const token = localStorage.getItem('token');
+    const btn = document.getElementById('btn-crear-vacante');
+    
+    // Recolectamos los datos del formulario
     const datosVacante = {
         title: document.getElementById('title').value,
         description_original: document.getElementById('description').value,
@@ -96,72 +127,101 @@ async function crearVacante() {
         priority: document.getElementById('priority').value || "medium"
     };
 
+    // Validación: El título y la descripción son obligatorios
     if (!datosVacante.title || !datosVacante.description_original) {
-        document.getElementById('mensaje-error-texto').innerText = "Llena los campos obligatorios (*).";
-        modalError.show();
+        mostrarErrorVacante("Completa los campos obligatorios (*)");
         return;
     }
 
-    // 1. Mostrar carga
-    modalCargando.show();
+    // 1. ESTADO: Mostramos la cajita blanca de "Procesando"
+    mostrarStatusPro('cargando', 'Analizando con IA...');
+    ocultarErrorVacante();
 
     try {
         const response = await fetch(`${API_URL}/offers/`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(datosVacante)
         });
 
-        // 2. Ocultar carga inmediatamente después de la respuesta
-        modalCargando.hide();
-
         if (response.ok) {
-            // 3. Cerrar el modal del formulario
-            const modalForm = bootstrap.Modal.getInstance(document.getElementById('modalNuevaVacante'));
-            if (modalForm) modalForm.hide();
+            // 2. ESTADO: ¡Éxito! (Check verde)
+            mostrarStatusPro('exito', '¡Vacante Creada!');
 
-            // 4. LIMPIEZA CRÍTICA: Quitamos el fondo negro antes de mostrar el éxito
-            removerFondoOscuro();
-
-            // 5. Mostrar éxito
             setTimeout(() => {
-                document.getElementById('mensaje-exito-texto').innerText = "Vacante creada correctamente.";
-                modalExito.show();
-            }, 300); // Pequeño delay para que Bootstrap respire
+                // Cerramos el modal de Bootstrap del formulario
+                const modalEl = document.getElementById('modalNuevaVacante');
+                const modalBus = bootstrap.Modal.getInstance(modalEl);
+                if (modalBus) modalBus.hide();
 
-            document.getElementById('formVacante').reset();
-            obtenerVacantes();
+                // Limpiamos todo
+                ocultarStatusPro();
+                document.getElementById('formVacante').reset();
+                obtenerVacantes(); // Recargamos la lista para ver la nueva
+            }, 1500);
+
         } else {
             const err = await response.json();
-            document.getElementById('mensaje-error-texto').innerText = "Error: " + (err.detail || "No guardado");
-            modalError.show();
+            ocultarStatusPro();
+            mostrarErrorVacante(err.detail || "Error al guardar");
         }
     } catch (error) {
-        modalCargando.hide();
-        removerFondoOscuro();
-        document.getElementById('mensaje-error-texto').innerText = "Error de red.";
-        modalError.show();
+        ocultarStatusPro();
+        mostrarErrorVacante("Sin conexión con el servidor");
     }
 }
 
+/* =====================================================
+   FUNCIONES DE APOYO VISUAL (MODAL DE ESTADO PRO)
+===================================================== */
+
+function mostrarStatusPro(estado, mensaje) {
+    const container = document.getElementById('status-container');
+    const texto = document.getElementById('status-texto');
+    const spinner = document.getElementById('status-spinner');
+    const check = document.getElementById('status-check');
+
+    if (!container) return;
+
+    container.classList.remove('d-none');
+    texto.innerText = mensaje;
+
+    if (estado === 'cargando') {
+        spinner.classList.remove('d-none');
+        check.classList.add('d-none');
+        texto.classList.remove('text-success');
+    } else {
+        spinner.classList.add('d-none');
+        check.classList.remove('d-none');
+        texto.classList.add('text-success');
+    }
+}
+
+function ocultarStatusPro() {
+    const container = document.getElementById('status-container');
+    if (container) container.classList.add('d-none');
+}
+
+function mostrarErrorVacante(mensaje) {
+    const alerta = document.getElementById('alerta-error-vacante');
+    const texto = document.getElementById('mensaje-error-vacante');
+    if (alerta && texto) {
+        texto.innerText = mensaje;
+        alerta.classList.remove('d-none');
+    }
+}
+
+function ocultarErrorVacante() {
+    const alerta = document.getElementById('alerta-error-vacante');
+    if (alerta) alerta.classList.add('d-none');
+}
+
 /**
- * FUNCIÓN DE LIMPIEZA FORZOSA (Solución al fondo negro)
+ * Filtra las tarjetas de vacantes en tiempo real
  */
-function removerFondoOscuro() {
-    // Elimina la clase que bloquea el scroll
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
-
-    // Elimina cualquier capa oscura sobrante
-    const backdrops = document.querySelectorAll('.modal-backdrop');
-    backdrops.forEach(b => b.remove());
-}
-
-function actualizarEstadisticas(vacantes) {
-    document.getElementById('stat-abiertas').innerText = vacantes.length;
-}
-
 function filtrarVacantes() {
     const texto = document.getElementById('searchInput').value.toLowerCase();
     const tarjetas = document.querySelectorAll('.job-card');

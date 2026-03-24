@@ -121,7 +121,85 @@ body{
 /* =====================================================
    ENCABEZADO LOGIN
 ===================================================== */
+/* =====================================================
+   MODAL DE ESTADO FLOTANTE (ESTILO TOAST)
+   Este es el que aparece al registrarse o loguearse
+===================================================== */
 
+/* 1. El contenedor que cubre toda la pantalla */
+#status-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Fondo semi-transparente */
+    background: rgba(255, 255, 255, 0.2); 
+    /* El efecto de desenfoque pixelado de fondo */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000; /* Siempre por encima de todo */
+    transition: all 0.3s ease;
+}
+
+/* 2. La cajita blanca central (basada en tu imagen) */
+.status-box {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 1.2rem;
+    text-align: center;
+    width: 280px;
+    /* Sombra suave para dar profundidad */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    
+    /* Animación de entrada: aparece subiendo un poquito */
+    animation: aparecerStatus 0.4s ease-out forwards;
+}
+
+/* 3. Tamaño de la rueda de carga y el check */
+#status-spinner {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-width: 0.25em;
+}
+
+#status-check {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* 4. Texto dentro de la cajita */
+#status-texto {
+    font-size: 1rem;
+    color: #374151;
+    margin-top: 1rem;
+}
+
+/* ===============================
+   ANIMACIONES
+=============================== */
+
+@keyframes aparecerStatus {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Clase de utilidad para ocultar elementos */
+.d-none {
+    display: none !important;
+}
 .encabezado{
 
     background:
@@ -724,268 +802,173 @@ transform: scale(0.95);
     font-size:1.5rem;
 }
 
-
 /* =====================================================
-   MODULO VACANTES - 
-   Compatible con APP HIBRIDA
+   MODULO VACANTES 
 ===================================================== */
 
+/* ===============================
+   EFECTO DE FONDO PIXELADO (BLUR) 
+
+===================================================== */
+.modal-backdrop {
+    /* Quitamos el negro sólido y ponemos un blanco muy transparente */
+    background-color: rgba(255, 255, 255, 0.3) !important; 
+    /* El truco del desenfoque */
+    backdrop-filter: blur(10px) saturate(150%);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+    z-index: 1990 !important;
+}
+
+/* Para que el modal no se vea pegado a la pantalla, le damos un toque de cristal */
+.modal-content-app {
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+}
 
 /* ===============================
 TARJETAS DE VACANTES
 =============================== */
-
 .job-card {
-
     background: white;
-
     border-radius: 1rem;
-
     border: 1px solid #eee;
-
     border-left: 0.4rem solid #cbd5e1;
-
     padding: 1.2rem;
-
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-
     transition: transform .2s;
-
+    margin-bottom: 1rem; /* Añadido para que no se peguen */
 }
 
 .job-card:active {
-
     transform: scale(0.98);
-
 }
 
-
-/* prioridades */
-
-.prioridad-alta {
-    border-left-color: #ef4444 !important;
+.prioridad-high {
+    border-left-color: #ef4444 !important; /* Rojo para Alta */
 }
 
-.prioridad-media {
-    border-left-color: #f59e0b !important;
+.prioridad-medium {
+    border-left-color: #f59e0b !important; /* Naranja para Media */
 }
 
-.prioridad-baja {
-    border-left-color: #3b82f6 !important;
+.prioridad-low {
+    border-left-color: #10b981 !important; /* Verde para Baja */
 }
-
-
 
 /* ===============================
 BOTON FLOTANTE
 =============================== */
-
 .btn-flotante-accion {
-
     position: fixed;
-
     bottom: 5.5rem;
-
     right: 1.5rem;
-
     width: 3.8rem;
-
     height: 3.8rem;
-
     border-radius: 50%;
-
     background: #2563eb;
-
     color: white;
-
     border: none;
-
     font-size: 1.8rem;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
-
     z-index: 1000;
-
 }
-
-
 
 /* ===============================
 MODAL APP HIBRIDA
 =============================== */
-
 .modal {
     z-index: 2000 !important;
 }
 
-.modal-backdrop {
-    z-index: 1990 !important;
-}
-
 @media (max-width:576px){
+    .modal-dialog-bottom {
+        margin: 0;
+        display: flex;
+        align-items: flex-end;
+        min-height: 100%;
+    }
 
-.modal-dialog-bottom{
-
-    margin:0;
-
-    display:flex;
-
-    align-items:flex-end;
-
-    min-height:100%;
-
+    .modal-content-app {
+        border-radius: 1.5rem 1.5rem 0 0 !important;
+        border: none;
+        background: white;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding-bottom: 6rem;
+    }
 }
-
-.modal-content-app{
-
-    border-radius:1.5rem 1.5rem 0 0 !important;
-
-    border:none;
-
-    background:white;
-
-    max-height:90vh;
-
-    overflow-y:auto;
-
-    padding-bottom:6rem;
-
-}
-
-}
-
-
 
 /* ===============================
 FORMULARIO MODAL
 =============================== */
-
 .campo-app {
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:.3rem;
-
-    margin-bottom:1rem;
-
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    margin-bottom: 1rem;
 }
 
 .campo-app label {
-
-    font-size:.8rem;
-
-    font-weight:600;
-
-    color:#4b5563;
-
+    font-size: .8rem;
+    font-weight: 600;
+    color: #4b5563;
 }
 
 .campo-app input,
 .campo-app textarea,
 .campo-app select {
-
-    width:100%;
-
-    padding:.6rem .7rem;
-
-    border-radius:.5rem;
-
-    border:1px solid #e5e7eb;
-
-    font-size:.85rem;
-
-    background:white;
-
+    width: 100%;
+    padding: .6rem .7rem;
+    border-radius: .5rem;
+    border: 1px solid #e5e7eb;
+    font-size: .85rem;
+    background: #f9fafb; /* Color un poco más suave */
 }
-
 
 .campo-app input:focus,
 .campo-app textarea:focus,
 .campo-app select:focus {
-
-    border-color:#5f9cff;
-
-    box-shadow:0 0 0 3px rgba(95,156,255,.15);
-
-    outline:none;
-
+    border-color: #5f9cff;
+    box-shadow: 0 0 0 3px rgba(95,156,255,.15);
+    outline: none;
+    background: white;
 }
-
 
 .campo-app textarea {
-
-    resize:none;
-
+    resize: none;
 }
 
-
-
 /* ===============================
-BOTON MODAL
+BOTON MODAL (CREAR Y ANALIZAR)
 =============================== */
-
 .boton-primario {
-
-    width:100%;
-
-    padding:1rem;
-
-    border:none;
-
-    border-radius:1rem;
-
-    color:white;
-
-    font-weight:600;
-
-    background:
-
-    linear-gradient(
-        135deg,
-        #5f9cff,
-        #6a5acd
-    );
-
-    box-shadow:0 6px 14px rgba(95,156,255,.3);
-
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 1rem;
+    color: white;
+    font-weight: 600;
+    background: linear-gradient(135deg, #5f9cff, #6a5acd);
+    box-shadow: 0 6px 14px rgba(95,156,255,.3);
+    transition: all 0.3s ease;
 }
 
-
-
-/* ===============================
-EVITAR CHOQUE CON NAVBAR
-=============================== */
-
-.modal-content {
-
-    margin-bottom:60px;
-
+.boton-primario:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 6px rgba(95,156,255,.2);
 }
-
-
 
 /* ===============================
 SCROLL SUAVE EN MODAL
 =============================== */
-
 .modal-content-app::-webkit-scrollbar {
-
-    width:5px;
-
+    width: 5px;
 }
 
 .modal-content-app::-webkit-scrollbar-thumb {
-
-    background:#cbd5e1;
-
-    border-radius:10px;
-
+    background: #cbd5e1;
+    border-radius: 10px;
 }

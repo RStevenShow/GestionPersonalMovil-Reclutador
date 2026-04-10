@@ -1084,3 +1084,42 @@ SCROLL SUAVE EN MODAL
     border-bottom: 1px solid #f3f4f6;
     padding-bottom: 10px;
 }
+
+/* AJUSTES PARA EL MÓDULO DE DETALLE vacantes */
+
+/* Evita que los nombres largos de candidatos rompan el diseño en móvil */
+.tarjeta-accion h6 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px; /* Ajustado para pantallas de 375px o 414px */
+}
+
+/* Efecto de clic en las tarjetas de ranking */
+.tarjeta-accion:active {
+    background-color: #f1f5f9;
+    transform: scale(0.98);
+}
+
+/* Espaciado para que el encabezado no oculte el contenido */
+.encabezado-menu {
+    border-radius: 0 0 2rem 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Ajuste del contador de candidatos en el encabezado */
+.agenda-box {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.job-card {
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.2s;
+}
+
+/* Efecto visual cuando el dedo toca la pantalla (estilo PWA) */
+.job-card:active {
+    transform: scale(0.96) !important;
+    background-color: #f8fafc;
+}

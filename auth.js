@@ -93,11 +93,11 @@ if (formRegistro) {
 }
 
 /* =====================================================
-   FUNCIONES DE CONTROL VISUAL (LOS TRUCOS)
+   FUNCIONES DE CONTROL VISUAL 
 ===================================================== */
 
 /**
- * Controla la cajita flotante (Modal de Estado)
+ * (Modal de Estado)
  * @param {string} estado - 'cargando' o 'exito'
  * @param {string} mensaje - El texto que verá el usuario
  */

@@ -6,26 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú principal - MarkNica</title>
 
-    <!-- BOOTSTRAP -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- ICONOS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <!-- CHART.JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="app.css">
 </head>
 
 <body class="pantalla-menu">
 
-    <!-- ================= ENCABEZADO DINÁMICO ================= -->
     <header class="encabezado-menu">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <h4>
                     <i class="bi bi-cpu-fill me-2"></i>
-                    <span id="nombreApp">Cargando...</span>
+                    <span id="nombreApp">MarkNica AI</span>
                 </h4>
-                <!-- Botón de Cerrar Sesión -->
                 <button onclick="cerrarSesion()" class="btn btn-sm btn-outline-light border-0">
                     <i class="bi bi-box-arrow-right fs-4"></i>
                 </button>
@@ -57,21 +52,20 @@
         </div>
     </header>
 
-    <!-- ================= CONTENIDO PRINCIPAL ================= -->
-    <main class="container mt-4 fade">
+    <main class="container mt-4 fade-in">
         <h5 id="tituloAcciones" class="fw-bold mb-3">Acciones inmediatas</h5>
 
-        <!-- Contenedor de Alertas IA -->
         <div id="contenedor-acciones">
-            <div id="accion1" class="tarjeta-accion prioridad-alta p-3 mb-3 shadow-sm">
-                Sincronizando datos...
+            <div id="accion1" class="tarjeta-accion prioridad-alta p-3 mb-3 shadow-sm d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                Sincronizando con la nube...
             </div>
-            <div id="accion2" class="tarjeta-accion prioridad-media p-3 mb-3 shadow-sm">
+            <div id="accion2" class="tarjeta-accion prioridad-media p-3 mb-3 shadow-sm d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
                 Verificando vacantes...
             </div>
         </div>
 
-        <!-- ================= GRÁFICO REAL DE POSTGRESQL ================= -->
         <div class="card mt-4 border-0 shadow-sm" style="border-radius: 1.2rem;">
             <div class="card-body">
                 <h5 class="fw-bold mb-3">Estado del proceso</h5>
@@ -82,7 +76,6 @@
         </div>
     </main>
 
-    <!-- ================= BARRA DE NAVEGACIÓN ================= -->
     <nav class="barra-inferior-pro">
         <a href="menu.html" class="link-menu activo">
             <i class="bi bi-house-door-fill"></i>
@@ -102,9 +95,9 @@
         </a>
     </nav>
 
-    <!-- ================= LÓGICA DE CONEXIÓN AL BACKEND ================= -->
     <script>
-        const API_BASE_URL = "http://127.0.0.1:8000";
+        // URL DE TU BACKEND EN RENDER
+        const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
         const token = localStorage.getItem('token');
         let graficoReferencia = null;
 
@@ -134,46 +127,58 @@
                     return;
                 }
 
+                if (!response.ok) throw new Error("Error en la respuesta del servidor");
+
                 const data = await response.json();
                 renderizarPantalla(data);
 
             } catch (error) {
                 console.error("Error:", error);
                 document.getElementById("nombreApp").textContent = "Sin Conexión";
+                document.getElementById("accion1").innerHTML = `<i class="bi bi-wifi-off me-2"></i> El servidor está despertando...`;
+                document.getElementById("accion2").innerHTML = `<i class="bi bi-arrow-clockwise me-2"></i> Reintentando en breve.`;
+                
+                // Reintento automático a los 5 segundos si falla (útil para el Cold Start de Render)
+                setTimeout(obtenerDatosDashboard, 5000);
             }
         }
 
         function renderizarPantalla(data) {
             // Actualizar Textos
-            document.getElementById("nombreApp").textContent = data.appNombre;
-            document.getElementById("datoCandidatos").textContent = data.candidatos;
-            document.getElementById("datoEntrevistas").textContent = data.entrevistas;
-            document.getElementById("datoMatch").textContent = data.match + "%";
+            document.getElementById("nombreApp").textContent = data.appNombre || "MarkNica AI";
+            document.getElementById("datoCandidatos").textContent = data.candidatos || "0";
+            document.getElementById("datoEntrevistas").textContent = data.entrevistas || "0";
+            document.getElementById("datoMatch").textContent = (data.match || "0") + "%";
 
             // Actualizar Tarjetas de Acción
-            document.getElementById("accion1").innerHTML = `<i class="bi bi-exclamation-circle me-2"></i> ${data.acciones[0]}`;
-            document.getElementById("accion2").innerHTML = `<i class="bi bi-robot me-2"></i> ${data.acciones[1]}`;
+            if (data.acciones && data.acciones.length >= 2) {
+                document.getElementById("accion1").innerHTML = `<i class="bi bi-exclamation-circle me-2"></i> ${data.acciones[0]}`;
+                document.getElementById("accion2").innerHTML = `<i class="bi bi-robot me-2"></i> ${data.acciones[1]}`;
+            }
 
             // Dibujar Gráfico con datos reales
             dibujarGrafico(data.proceso);
         }
 
         function dibujarGrafico(proceso) {
-            const ctx = document.getElementById("graficoProceso").getContext('2d');
+            const canvas = document.getElementById("graficoProceso");
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             
             if (graficoReferencia) { graficoReferencia.destroy(); }
+
+            // Datos por defecto si el servidor manda ceros
+            const screening = proceso.screening || 0;
+            const entrevistas = proceso.entrevistas || 0;
+            const oferta = proceso.oferta || 0;
+            const contratados = proceso.contratados || 0;
 
             graficoReferencia = new Chart(ctx, {
                 type: "doughnut",
                 data: {
                     labels: ["Screening", "Entrevistas", "Oferta", "Contratados"],
                     datasets: [{
-                        data: [
-                            proceso.screening, 
-                            proceso.entrevistas, 
-                            proceso.oferta, 
-                            proceso.contratados
-                        ],
+                        data: [screening, entrevistas, oferta, contratados],
                         backgroundColor: ["#fbbf24", "#60a5fa", "#a78bfa", "#34d399"],
                         hoverOffset: 4,
                         borderWidth: 0
@@ -183,7 +188,14 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom' }
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: { size: 12 }
+                            }
+                        }
                     },
                     cutout: '75%'
                 }
@@ -197,8 +209,10 @@
 
         function marcarEnlaceActivo() {
             const links = document.querySelectorAll(".link-menu");
+            const currentPath = window.location.pathname.split("/").pop();
             links.forEach(link => {
-                if (link.href === window.location.href) {
+                const linkPath = link.getAttribute("href");
+                if (linkPath === currentPath) {
                     link.classList.add("activo");
                 }
             });

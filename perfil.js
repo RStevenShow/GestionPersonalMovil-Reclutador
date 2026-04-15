@@ -1,9 +1,9 @@
 /* =====================================================
-   PERFIL.JS - VERSIÓN ENFOCADA A MÓVIL (BOTTOM SHEET)
+   PERFIL.JS - VERSIÓN ENFOCADA A MÓVIL (RENDER)
    Proyecto: MarkNica Recruiting AI
 ===================================================== */
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
 const token = localStorage.getItem('token');
 
 // Variables de estado
@@ -25,11 +25,19 @@ document.addEventListener('DOMContentLoaded', () => {
 // 2. CONFIGURACIÓN DE EVENTOS
 function configurarEventos() {
     // Modal de Confirmación (Eliminar Vacante)
-    document.getElementById('confirm-cancel').addEventListener('click', () => {
-        document.getElementById('confirm-container').classList.add('d-none');
-        idVacanteParaBorrar = null;
-    });
-    document.getElementById('confirm-accept').addEventListener('click', ejecutarEliminacion);
+    const btnCancel = document.getElementById('confirm-cancel');
+    const btnAccept = document.getElementById('confirm-accept');
+
+    if (btnCancel) {
+        btnCancel.addEventListener('click', () => {
+            document.getElementById('confirm-container').classList.add('d-none');
+            idVacanteParaBorrar = null;
+        });
+    }
+    
+    if (btnAccept) {
+        btnAccept.addEventListener('click', ejecutarEliminacion);
+    }
 
     // Evento para subir foto
     const inputFoto = document.getElementById('subir-foto');
@@ -38,7 +46,7 @@ function configurarEventos() {
     }
 }
 
-// 3. CARGAR DATOS DEL RECLUTADOR
+// 3. CARGAR DATOS DEL RECLUTADOR (RAMÓN)
 async function cargarDatosUsuario() {
     try {
         const response = await fetch(`${API_BASE_URL}/users/me`, {
@@ -51,7 +59,12 @@ async function cargarDatosUsuario() {
             document.getElementById('perfil-email').innerText = user.email;
             
             if (user.photo_url) {
-                document.getElementById('img-perfil').src = user.photo_url + "?t=" + new Date().getTime();
+                // Si la ruta es relativa (/static/...), le pegamos la base de Render
+                const finalUrl = user.photo_url.startsWith('http') 
+                    ? user.photo_url 
+                    : `${API_BASE_URL}${user.photo_url}`;
+                
+                document.getElementById('img-perfil').src = finalUrl + "?t=" + new Date().getTime();
             }
         }
     } catch (error) {
@@ -68,7 +81,8 @@ function abrirEditor(campo) {
     const input = document.getElementById('input-nuevo-valor');
     const label = document.getElementById('label-input');
 
-    // Resetear y configurar según el campo
+    if (!sheet || !overlay) return;
+
     input.value = "";
     overlay.classList.remove('d-none');
 
@@ -84,7 +98,6 @@ function abrirEditor(campo) {
         input.placeholder = "Ej: Ramón Steven";
     }
 
-    // Animación de subida
     setTimeout(() => sheet.classList.add('active'), 10);
 }
 
@@ -92,8 +105,10 @@ function cerrarSheet() {
     const sheet = document.getElementById('bottom-sheet');
     const overlay = document.getElementById('sheet-overlay');
     
-    sheet.classList.remove('active');
-    setTimeout(() => overlay.classList.add('d-none'), 400);
+    if (sheet) sheet.classList.remove('active');
+    setTimeout(() => {
+        if (overlay) overlay.classList.add('d-none');
+    }, 400);
 }
 
 async function guardarCambioSheet() {
@@ -101,16 +116,14 @@ async function guardarCambioSheet() {
     if (!nuevoValor) return;
 
     cerrarSheet();
-    mostrarStatusPro('cargando', 'Actualizando...');
+    mostrarStatusPro('cargando', 'Actualizando perfil...');
 
     try {
-        // Creamos un objeto con los datos actuales para no enviar campos nulos
-        // El backend necesita username y email obligatoriamente según UserCreate
         const updateData = {
-            username: document.getElementById('perfil-email').innerText, // Usamos el correo como username
+            username: document.getElementById('perfil-email').innerText, 
             email: document.getElementById('perfil-email').innerText,
             full_name: document.getElementById('perfil-nombre').innerText,
-            password: "" // Por defecto vacía si no se cambia
+            password: "" 
         };
 
         if (campoActual === 'password') updateData.password = nuevoValor;
@@ -126,22 +139,22 @@ async function guardarCambioSheet() {
         });
 
         if (response.ok) {
-            mostrarStatusPro('exito', '¡Datos Guardados!');
+            mostrarStatusPro('exito', '¡Datos Actualizados!');
             setTimeout(() => {
                 ocultarStatusPro();
-                cargarDatosUsuario(); // Refresca la pantalla
+                cargarDatosUsuario();
             }, 1200);
         } else {
             ocultarStatusPro();
-            alert("Error al guardar: Verifique los datos");
+            alert("Error al actualizar. Intenta de nuevo.");
         }
     } catch (error) {
         ocultarStatusPro();
-        alert("Error de conexión con el servidor");
+        alert("Sin conexión con el servidor.");
     }
 }
 
-// 5. GESTIÓN DE VACANTES (CARGAR Y ELIMINAR)
+// 5. GESTIÓN DE MIS VACANTES
 async function cargarMisVacantes() {
     const contenedor = document.getElementById('lista-mis-vacantes');
     const badge = document.getElementById('badge-vacantes');
@@ -153,10 +166,10 @@ async function cargarMisVacantes() {
 
         if (response.ok) {
             const vacantes = await response.json();
-            badge.innerText = vacantes.length;
+            if (badge) badge.innerText = vacantes.length;
 
             if (vacantes.length === 0) {
-                contenedor.innerHTML = `<p class="text-center small text-muted py-3">No tienes vacantes activas.</p>`;
+                contenedor.innerHTML = `<p class="text-center small text-muted py-3">No hay vacantes activas.</p>`;
                 return;
             }
 
@@ -164,29 +177,30 @@ async function cargarMisVacantes() {
                 <div class="mini-card-vacante" id="card-${v.id}">
                     <div>
                         <h6 class="fw-bold mb-0">${v.title}</h6>
-                        <small class="text-muted">${v.location || 'Remoto'}</small>
+                        <small class="text-muted">${v.location || 'Nicaragua'}</small>
                     </div>
                     <button class="btn-borrar-mini" onclick="prepararEliminacion(${v.id})">
-                        <i class="bi bi-trash"></i>
+                        <i class="bi bi-trash text-danger"></i>
                     </button>
                 </div>
             `).join('');
         }
     } catch (error) {
-        contenedor.innerHTML = `<p class="text-danger small text-center">Error de conexión.</p>`;
+        if (contenedor) contenedor.innerHTML = `<p class="text-danger small text-center">Error al conectar.</p>`;
     }
 }
 
 function prepararEliminacion(id) {
     idVacanteParaBorrar = id;
-    document.getElementById('confirm-container').classList.remove('d-none');
+    const confirmContainer = document.getElementById('confirm-container');
+    if (confirmContainer) confirmContainer.classList.remove('d-none');
 }
 
 async function ejecutarEliminacion() {
     if (!idVacanteParaBorrar) return;
 
     document.getElementById('confirm-container').classList.add('d-none');
-    mostrarStatusPro('cargando', 'Eliminando...');
+    mostrarStatusPro('cargando', 'Eliminando vacante...');
 
     try {
         const response = await fetch(`${API_BASE_URL}/offers/${idVacanteParaBorrar}`, {
@@ -207,12 +221,12 @@ async function ejecutarEliminacion() {
     }
 }
 
-// 6. FOTO DE PERFIL
+// 6. SUBIR FOTO DE PERFIL
 async function subirFotoPerfil(e) {
     const file = e.target.files[0];
     if (!file) return;
 
-    mostrarStatusPro('cargando', 'Subiendo foto...');
+    mostrarStatusPro('cargando', 'Subiendo imagen...');
     const formData = new FormData();
     formData.append('file', file);
 
@@ -225,57 +239,22 @@ async function subirFotoPerfil(e) {
 
         if (response.ok) {
             const data = await response.json();
-            document.getElementById('img-perfil').src = data.foto_url + "?t=" + new Date().getTime();
+            const finalUrl = data.foto_url.startsWith('http') ? data.foto_url : `${API_BASE_URL}${data.foto_url}`;
+            document.getElementById('img-perfil').src = finalUrl + "?t=" + new Date().getTime();
             mostrarStatusPro('exito', 'Foto actualizada');
             setTimeout(ocultarStatusPro, 1500);
         }
     } catch (error) {
         ocultarStatusPro();
-        alert("Error al subir foto.");
+        alert("Error de red al subir foto.");
     }
 }
 
-// 7. DAR DE BAJA
-function confirmarBajaCuenta() {
-    // Mostramos el modal de baja en lugar del alert
-    document.getElementById('confirm-baja-container').classList.remove('d-none');
+// 7. CERRAR SESIÓN
+function cerrarSesion() {
+    localStorage.clear();
+    window.location.href = "Login.html";
 }
-
-// Configurar botones del modal de BAJA
-document.getElementById('baja-cancel').addEventListener('click', () => {
-    document.getElementById('confirm-baja-container').classList.add('d-none');
-});
-
-document.getElementById('baja-accept').addEventListener('click', async () => {
-    // Cerramos el modal de pregunta
-    document.getElementById('confirm-baja-container').classList.add('d-none');
-    
-    // Mostramos la cajita de estado
-    mostrarStatusPro('cargando', 'Borrando cuenta permanentemente...');
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/users/me`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (response.ok) {
-            mostrarStatusPro('exito', 'Cuenta eliminada');
-            
-            // Esperamos un momento y limpiamos todo para ir al Login
-            setTimeout(() => {
-                localStorage.clear();
-                window.location.href = "Login.html";
-            }, 2000);
-        } else {
-            ocultarStatusPro();
-            alert("Error al intentar eliminar la cuenta.");
-        }
-    } catch (error) {
-        ocultarStatusPro();
-        console.error("Error de red:", error);
-    }
-});
 
 // --- UTILIDADES DE UI ---
 function mostrarStatusPro(estado, mensaje) {

@@ -57,7 +57,30 @@
                 </div>
             </div>
         </div>
+     <main class="container p-3 fade">
+ 
 
+    <h6 class="text-muted small fw-bold mb-3 ms-2 text-uppercase">Preferencias del Dispositivo</h6>
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="list-group list-group-flush">
+            <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                        <i class="bi bi-bell-fill text-primary"></i>
+                    </div>
+                    <div>
+                        <span class="fw-medium d-block">Alertas de Candidatos</span>
+                        <small class="text-muted">Notificar matches nuevos</small>
+                    </div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="switchNotificaciones">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </main>
         <div class="d-flex justify-content-between align-items-center mb-3 ms-2">
             <h6 class="text-muted small fw-bold mb-0 text-uppercase">Mis Vacantes Publicadas</h6>
             <span class="badge bg-primary rounded-pill" id="badge-vacantes">0</span>
@@ -145,7 +168,83 @@
         </div>
     </div>
 </div>
+        
+    <script>
+    const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
+    const PUBLIC_VAPID_KEY = 'BHoEUkzRM2Q1dV--9491i3Z3dBpFpDQL1DkSW6EmyUK7s7NltbaKm89p1up6-vVG87t3TaGvoUzysmut_5wsddk';
 
+    // 1. Registro del Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+            console.log('✔ Service Worker listo');
+        });
+    }   
+
+    // 2. Conversión de llave para Hardware
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    // 3. Lógica de activación de Notificaciones
+    async function activarNotificaciones() {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            const permission = await Notification.requestPermission();
+            
+            if (permission === 'granted') {
+                const convertedKey = urlBase64ToUint8Array(PUBLIC_VAPID_KEY);
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: convertedKey
+                });
+
+                const response = await fetch(`${API_BASE_URL}/api/save-subscription`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(subscription)
+                });
+
+                if (response.ok) {
+                    alert('¡Notificaciones vinculadas!');
+                    return true;
+                }
+            }
+            return false;
+        } catch (error) {
+            console.error('Error de hardware:', error);
+            // Este error en LOCAL es normal si no usas HTTPS o localhost puro
+            alert('Error de Hardware. El navegador bloqueó el servicio Push en esta red local.');
+            return false;
+        }
+    }
+
+    // 4. Vínculo manual de eventos (Solución al ReferenceError)
+    window.addEventListener('load', () => {
+        const swNotif = document.getElementById('switchNotificaciones');
+        if (swNotif) {
+            // Sincronizar estado visual
+            if (Notification.permission === 'granted') swNotif.checked = true;
+
+            // Escuchar el cambio sin usar onchange en el HTML
+            swNotif.addEventListener('change', async function() {
+                if (this.checked) {
+                    const exito = await activarNotificaciones();
+                    if (!exito) this.checked = false;
+                }
+            });
+        }
+    });
+</script>
     <script src="perfil.js"></script>
 </body>
 

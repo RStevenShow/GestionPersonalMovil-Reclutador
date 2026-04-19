@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú principal - MarkNica</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inicio - MarkNica AI</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -12,17 +12,17 @@
     <link rel="stylesheet" href="app.css">
     <link rel="manifest" href="manifest.json">
 
-<meta name="theme-color" content="#2563eb">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 
 <body class="pantalla-menu">
 
-    <header class="encabezado-menu">
+    <header class="encabezado-menu shadow-sm">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
-                <h4>
+                <h4 class="mb-0 fw-bold">
                     <i class="bi bi-cpu-fill me-2"></i>
                     <span id="nombreApp">MarkNica AI</span>
                 </h4>
@@ -31,22 +31,22 @@
                 </button>
             </div>
 
-            <div class="row mt-3 text-center">
-                <div class="col-4">
+            <div class="row mt-4 text-center gap-2 px-2">
+                <div class="col p-0">
                     <div class="estadistica">
                         <span id="datoCandidatos">--</span>
                         <br>
                         <small>Candidatos</small>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col p-0">
                     <div class="estadistica">
                         <span id="datoEntrevistas">--</span>
                         <br>
                         <small>Entrevistas</small>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col p-0">
                     <div class="estadistica">
                         <span id="datoMatch">--%</span>
                         <br>
@@ -57,24 +57,24 @@
         </div>
     </header>
 
-    <main class="container mt-4 fade-in">
-        <h5 id="tituloAcciones" class="fw-bold mb-3">Acciones inmediatas</h5>
+    <main class="container mt-4 fade">
+        <h5 id="tituloAcciones" class="fw-bold mb-3 text-dark">Acciones inmediatas</h5>
 
         <div id="contenedor-acciones">
-            <div id="accion1" class="tarjeta-accion prioridad-alta p-3 mb-3 shadow-sm d-flex align-items-center">
-                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                Sincronizando con la nube...
+            <div id="accion1" class="tarjeta-accion prioridad-alta p-3 mb-3 d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm text-danger me-3" role="status"></div>
+                <span class="text-secondary fw-medium">Sincronizando con la nube...</span>
             </div>
-            <div id="accion2" class="tarjeta-accion prioridad-media p-3 mb-3 shadow-sm d-flex align-items-center">
-                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                Verificando vacantes...
+            <div id="accion2" class="tarjeta-accion prioridad-media p-3 mb-3 d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm text-warning me-3" role="status"></div>
+                <span class="text-secondary fw-medium">Verificando vacantes...</span>
             </div>
         </div>
 
-        <div class="card mt-4 border-0 shadow-sm" style="border-radius: 1.2rem;">
-            <div class="card-body">
-                <h5 class="fw-bold mb-3">Estado del proceso</h5>
-                <div style="position: relative; height:250px;">
+        <div class="card mt-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3 text-dark">Estado del proceso</h5>
+                <div style="position: relative; height: 250px;">
                     <canvas id="graficoProceso"></canvas>
                 </div>
             </div>
@@ -82,39 +82,23 @@
     </main>
 
     <nav class="barra-inferior-pro">
-        <a href="menu.html" class="link-menu activo">
-            <i class="bi bi-house-door-fill"></i>
-            <span>Inicio</span>
-        </a>
-        <a href="vacantes.html" class="link-menu">
-            <i class="bi bi-briefcase"></i>
-            <span>Vacantes</span>
-        </a>
-        <a href="agenda.html" class="link-menu">
-            <i class="bi bi-calendar-event"></i>
-            <span>Agenda</span>
-        </a>
-        <a href="perfil.html" class="link-menu">
-            <i class="bi bi-person-circle"></i>
-            <span>Perfil</span>
-        </a>
+        <a href="menu.html" class="link-menu activo"><i class="bi bi-house"></i><span>Inicio</span></a>
+        <a href="vacantes.html" class="link-menu"><i class="bi bi-briefcase"></i><span>Vacantes</span></a>
+        <a href="agenda.html" class="link-menu"><i class="bi bi-calendar"></i><span>Agenda</span></a>
+        <a href="perfil.html" class="link-menu"><i class="bi bi-person"></i><span>Perfil</span></a>
     </nav>
 
     <script>
-        // URL DE TU BACKEND EN RENDER
         const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
         const token = localStorage.getItem('token');
         let graficoReferencia = null;
 
-        // 1. Proteger la ruta: Si no hay token, fuera.
         if (!token) {
             window.location.href = "Login.html";
         }
 
-        // 2. Al cargar la página, pedir datos al servidor
         document.addEventListener('DOMContentLoaded', () => {
             obtenerDatosDashboard();
-            marcarEnlaceActivo();
         });
 
         async function obtenerDatosDashboard() {
@@ -139,30 +123,30 @@
 
             } catch (error) {
                 console.error("Error:", error);
-                document.getElementById("nombreApp").textContent = "Sin Conexión";
-                document.getElementById("accion1").innerHTML = `<i class="bi bi-wifi-off me-2"></i> El servidor está despertando...`;
-                document.getElementById("accion2").innerHTML = `<i class="bi bi-arrow-clockwise me-2"></i> Reintentando en breve.`;
+                document.getElementById("nombreApp").textContent = "Modo Offline";
+                document.getElementById("accion1").innerHTML = `<i class="bi bi-wifi-off text-danger fs-5 me-3"></i> <span class="text-secondary">Despertando servidor...</span>`;
+                document.getElementById("accion2").innerHTML = `<i class="bi bi-arrow-clockwise text-primary fs-5 me-3"></i> <span class="text-secondary">Reintentando conexión.</span>`;
                 
-                // Reintento automático a los 5 segundos si falla (útil para el Cold Start de Render)
                 setTimeout(obtenerDatosDashboard, 5000);
             }
         }
 
         function renderizarPantalla(data) {
-            // Actualizar Textos
             document.getElementById("nombreApp").textContent = data.appNombre || "MarkNica AI";
             document.getElementById("datoCandidatos").textContent = data.candidatos || "0";
-            document.getElementById("datoEntrevistas").textContent = data.entrevistas || "0";
+            
+            // Corregido: Buscar entrevistas dentro del objeto 'proceso'
+            document.getElementById("datoEntrevistas").textContent = (data.proceso && data.proceso.entrevistas) ? data.proceso.entrevistas : "0";
             document.getElementById("datoMatch").textContent = (data.match || "0") + "%";
 
-            // Actualizar Tarjetas de Acción
-            if (data.acciones && data.acciones.length >= 2) {
-                document.getElementById("accion1").innerHTML = `<i class="bi bi-exclamation-circle me-2"></i> ${data.acciones[0]}`;
-                document.getElementById("accion2").innerHTML = `<i class="bi bi-robot me-2"></i> ${data.acciones[1]}`;
-            }
+            // Asegurarnos de que no falle si el backend manda 1 o 0 acciones
+            const txtAccion1 = (data.acciones && data.acciones.length > 0) ? data.acciones[0] : "Todo al día";
+            const txtAccion2 = (data.acciones && data.acciones.length > 1) ? data.acciones[1] : "Esperando nuevos candidatos";
 
-            // Dibujar Gráfico con datos reales
-            dibujarGrafico(data.proceso);
+            document.getElementById("accion1").innerHTML = `<i class="bi bi-exclamation-circle text-danger fs-5 me-3"></i> <span class="text-secondary fw-medium">${txtAccion1}</span>`;
+            document.getElementById("accion2").innerHTML = `<i class="bi bi-robot text-warning fs-5 me-3"></i> <span class="text-secondary fw-medium">${txtAccion2}</span>`;
+
+            dibujarGrafico(data.proceso || {});
         }
 
         function dibujarGrafico(proceso) {
@@ -172,19 +156,24 @@
             
             if (graficoReferencia) { graficoReferencia.destroy(); }
 
-            // Datos por defecto si el servidor manda ceros
             const screening = proceso.screening || 0;
             const entrevistas = proceso.entrevistas || 0;
             const oferta = proceso.oferta || 0;
             const contratados = proceso.contratados || 0;
 
+            // Si todos son cero, mostrar un anillo gris
+            const total = screening + entrevistas + oferta + contratados;
+            const datos = total === 0 ? [1] : [screening, entrevistas, oferta, contratados];
+            const colores = total === 0 ? ["#e2e8f0"] : ["#f59e0b", "#3b82f6", "#8b5cf6", "#10b981"];
+            const etiquetas = total === 0 ? ["Sin datos"] : ["Screening", "Entrevistas", "Oferta", "Contratados"];
+
             graficoReferencia = new Chart(ctx, {
                 type: "doughnut",
                 data: {
-                    labels: ["Screening", "Entrevistas", "Oferta", "Contratados"],
+                    labels: etiquetas,
                     datasets: [{
-                        data: [screening, entrevistas, oferta, contratados],
-                        backgroundColor: ["#fbbf24", "#60a5fa", "#a78bfa", "#34d399"],
+                        data: datos,
+                        backgroundColor: colores,
                         hoverOffset: 4,
                         borderWidth: 0
                     }]
@@ -198,7 +187,7 @@
                             labels: {
                                 padding: 20,
                                 usePointStyle: true,
-                                font: { size: 12 }
+                                font: { size: 12, family: "system-ui" }
                             }
                         }
                     },
@@ -210,17 +199,6 @@
         function cerrarSesion() {
             localStorage.removeItem('token');
             window.location.href = "Login.html";
-        }
-
-        function marcarEnlaceActivo() {
-            const links = document.querySelectorAll(".link-menu");
-            const currentPath = window.location.pathname.split("/").pop();
-            links.forEach(link => {
-                const linkPath = link.getAttribute("href");
-                if (linkPath === currentPath) {
-                    link.classList.add("activo");
-                }
-            });
         }
     </script>
 </body>

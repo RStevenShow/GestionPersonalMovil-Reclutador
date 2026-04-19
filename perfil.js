@@ -1,6 +1,6 @@
 /* =====================================================
-   PERFIL.JS - VERSIÓN ENFOCADA A MÓVIL (RENDER)
-   Proyecto: MarkNica Recruiting AI
+   PERFIL.JS - VERSIÓN ENFOCADA A MÓVIL (ESTÉTICA PRO)
+   Proyecto: MarkNica AI
 ===================================================== */
 
 const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
@@ -22,31 +22,43 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarEventos();
 });
 
-// 2. CONFIGURACIÓN DE EVENTOS
+// 2. CONFIGURACIÓN DE EVENTOS (MODALES)
 function configurarEventos() {
-    // Modal de Confirmación (Eliminar Vacante)
-    const btnCancel = document.getElementById('confirm-cancel');
-    const btnAccept = document.getElementById('confirm-accept');
+    // --- Modal: Eliminar Vacante ---
+    const btnCancelVacante = document.getElementById('confirm-cancel');
+    const btnAcceptVacante = document.getElementById('confirm-accept');
 
-    if (btnCancel) {
-        btnCancel.addEventListener('click', () => {
+    if (btnCancelVacante) {
+        btnCancelVacante.addEventListener('click', () => {
             document.getElementById('confirm-container').classList.add('d-none');
             idVacanteParaBorrar = null;
         });
     }
-    
-    if (btnAccept) {
-        btnAccept.addEventListener('click', ejecutarEliminacion);
+    if (btnAcceptVacante) {
+        btnAcceptVacante.addEventListener('click', ejecutarEliminacion);
     }
 
-    // Evento para subir foto
+    // --- Modal: Eliminar Cuenta ---
+    const btnCancelBaja = document.getElementById('baja-cancel');
+    const btnAcceptBaja = document.getElementById('baja-accept');
+
+    if (btnCancelBaja) {
+        btnCancelBaja.addEventListener('click', () => {
+            document.getElementById('confirm-baja-container').classList.add('d-none');
+        });
+    }
+    if (btnAcceptBaja) {
+        btnAcceptBaja.addEventListener('click', ejecutarBajaCuenta);
+    }
+
+    // --- Evento: Subir foto ---
     const inputFoto = document.getElementById('subir-foto');
     if (inputFoto) {
         inputFoto.addEventListener('change', subirFotoPerfil);
     }
 }
 
-// 3. CARGAR DATOS DEL RECLUTADOR (RAMÓN)
+// 3. CARGAR DATOS DEL RECLUTADOR
 async function cargarDatosUsuario() {
     try {
         const response = await fetch(`${API_BASE_URL}/users/me`, {
@@ -55,15 +67,13 @@ async function cargarDatosUsuario() {
 
         if (response.ok) {
             const user = await response.json();
-            document.getElementById('perfil-nombre').innerText = user.full_name || user.username;
+            document.getElementById('perfil-nombre').innerHTML = `${user.full_name || user.username} <i class="bi bi-pencil-square small opacity-50 ms-1"></i>`;
             document.getElementById('perfil-email').innerText = user.email;
             
             if (user.photo_url) {
-                // Si la ruta es relativa (/static/...), le pegamos la base de Render
                 const finalUrl = user.photo_url.startsWith('http') 
                     ? user.photo_url 
                     : `${API_BASE_URL}${user.photo_url}`;
-                
                 document.getElementById('img-perfil').src = finalUrl + "?t=" + new Date().getTime();
             }
         }
@@ -95,7 +105,7 @@ function abrirEditor(campo) {
         titulo.innerText = "Editar Nombre";
         label.innerText = "Nombre Completo";
         input.type = "text";
-        input.placeholder = "Ej: Ramón Steven";
+        input.placeholder = "Ej: Ana García";
     }
 
     setTimeout(() => sheet.classList.add('active'), 10);
@@ -108,7 +118,7 @@ function cerrarSheet() {
     if (sheet) sheet.classList.remove('active');
     setTimeout(() => {
         if (overlay) overlay.classList.add('d-none');
-    }, 400);
+    }, 400); // Tiempo de la animación de bajada
 }
 
 async function guardarCambioSheet() {
@@ -119,10 +129,14 @@ async function guardarCambioSheet() {
     mostrarStatusPro('cargando', 'Actualizando perfil...');
 
     try {
+        const currentEmail = document.getElementById('perfil-email').innerText;
+        // Limpiamos el HTML del nombre por si trae el icono del lapicito
+        const currentName = document.getElementById('perfil-nombre').innerText.trim();
+        
         const updateData = {
-            username: document.getElementById('perfil-email').innerText, 
-            email: document.getElementById('perfil-email').innerText,
-            full_name: document.getElementById('perfil-nombre').innerText,
+            username: currentEmail, 
+            email: currentEmail,
+            full_name: currentName,
             password: "" 
         };
 
@@ -169,18 +183,18 @@ async function cargarMisVacantes() {
             if (badge) badge.innerText = vacantes.length;
 
             if (vacantes.length === 0) {
-                contenedor.innerHTML = `<p class="text-center small text-muted py-3">No hay vacantes activas.</p>`;
+                contenedor.innerHTML = `<p class="text-center small text-muted py-3 bg-white rounded-4 shadow-sm">No tienes vacantes activas.</p>`;
                 return;
             }
 
             contenedor.innerHTML = vacantes.map(v => `
-                <div class="mini-card-vacante" id="card-${v.id}">
+                <div class="mini-card-vacante border-0 mb-2" id="card-${v.id}">
                     <div>
-                        <h6 class="fw-bold mb-0">${v.title}</h6>
-                        <small class="text-muted">${v.location || 'Nicaragua'}</small>
+                        <h6 class="fw-bold mb-0 text-dark">${v.title}</h6>
+                        <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>${v.location || 'Nicaragua'}</small>
                     </div>
-                    <button class="btn-borrar-mini" onclick="prepararEliminacion(${v.id})">
-                        <i class="bi bi-trash text-danger"></i>
+                    <button class="btn-borrar-mini shadow-sm" onclick="prepararEliminacion(${v.id})">
+                        <i class="bi bi-trash-fill fs-5"></i>
                     </button>
                 </div>
             `).join('');
@@ -190,6 +204,7 @@ async function cargarMisVacantes() {
     }
 }
 
+// --- Eliminar Vacante ---
 function prepararEliminacion(id) {
     idVacanteParaBorrar = id;
     const confirmContainer = document.getElementById('confirm-container');
@@ -209,7 +224,7 @@ async function ejecutarEliminacion() {
         });
 
         if (response.ok) {
-            mostrarStatusPro('exito', '¡Eliminada!');
+            mostrarStatusPro('exito', '¡Vacante eliminada!');
             setTimeout(() => {
                 ocultarStatusPro();
                 cargarMisVacantes();
@@ -221,7 +236,39 @@ async function ejecutarEliminacion() {
     }
 }
 
-// 6. SUBIR FOTO DE PERFIL
+// 6. ELIMINAR CUENTA (NUEVO)
+function confirmarBajaCuenta() {
+    const modalBaja = document.getElementById('confirm-baja-container');
+    if (modalBaja) modalBaja.classList.remove('d-none');
+}
+
+async function ejecutarBajaCuenta() {
+    document.getElementById('confirm-baja-container').classList.add('d-none');
+    mostrarStatusPro('cargando', 'Eliminando datos...');
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/me`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            mostrarStatusPro('exito', 'Cuenta eliminada');
+            setTimeout(() => {
+                localStorage.clear();
+                window.location.href = "Login.html";
+            }, 1500);
+        } else {
+            ocultarStatusPro();
+            alert("No se pudo eliminar la cuenta.");
+        }
+    } catch (error) {
+        ocultarStatusPro();
+        alert("Error de conexión al intentar borrar.");
+    }
+}
+
+// 7. SUBIR FOTO DE PERFIL
 async function subirFotoPerfil(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -248,12 +295,6 @@ async function subirFotoPerfil(e) {
         ocultarStatusPro();
         alert("Error de red al subir foto.");
     }
-}
-
-// 7. CERRAR SESIÓN
-function cerrarSesion() {
-    localStorage.clear();
-    window.location.href = "Login.html";
 }
 
 // --- UTILIDADES DE UI ---

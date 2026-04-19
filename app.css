@@ -1,1007 +1,219 @@
 /* =====================================================
-   APP HIBRIDA - ESTILOS GENERALES
-   Proyecto: Gestor de Talento Humano
+   APP HÍBRIDA - ESTILOS MAESTROS (PRODUCCIÓN)
+   Proyecto: MarkNica AI (Gestor de Talento Humano)
    Autor: Ramon
 ===================================================== */
 
+/* =====================================================
+   1. RESET Y VARIABLES GLOBALES
+===================================================== */
+:root {
+    --color-primario: #3b82f6;
+    --color-secundario: #8b5cf6;
+    --color-gradiente: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    --fondo-app: #f8fafc;
+    --texto-oscuro: #1e293b;
+    --texto-claro: #64748b;
+    --sombra-suave: 0 4px 15px rgba(0,0,0,0.04);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    min-height: 100dvh;
+    background: var(--fondo-app);
+    color: var(--texto-oscuro);
+    padding-bottom: 90px; /* Espacio para el menú inferior */
+    overflow-x: hidden;
+    touch-action: manipulation;
+}
+
+/* Clases Utilitarias */
+.d-none, .oculto { display: none !important; }
 
 /* =====================================================
-   RESET
+   2. PANTALLAS DE AUTENTICACIÓN (LOGIN/REGISTRO)
 ===================================================== */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+.pantalla-auth {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--color-gradiente) fixed;
+    position: relative;
 }
-
-html{
-    font-size:16px;
-    -webkit-tap-highlight-color:transparent;
-    user-select:none;
-}
-
-body{
-
-    font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Arial,
-    sans-serif;
-
-    min-height:100dvh;
-
-    background:
-    linear-gradient(
-        135deg,
-        #5f9cff,
-        #6a5acd
-    ) fixed;
-
-    padding-bottom:80px; /* espacio para navbar */
-
-}
-
-
-/* =====================================================
-   PANTALLAS
-===================================================== */
-
-.pantalla-auth{
-
-    min-height:100dvh;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    padding:1.5rem;
-
-}
-
-.pantalla-menu{
-
-    min-height:100dvh;
-
-    background:#f8fafc;
-
-    padding-bottom:90px;
-
-}
-
-
-
-/* =====================================================
-   TARJETAS
-===================================================== */
 
 .tarjeta-login,
-.tarjeta-blanca,
-.tarjeta-registro{
-
-    width:100%;
-
-    max-width:23rem;
-
-    background:white;
-
-    border-radius:1.5rem;
-
-    overflow:hidden;
-
-    box-shadow:
-    0 10px 25px rgba(0,0,0,.2);
-
-    margin:auto;
-
-}
-
-.tarjeta-blanca{
-
-    max-width:28rem;
-
-    padding:2rem;
-
-}
-
-.tarjeta-registro{
-
-    max-width:24rem;
-
-    padding:2rem;
-
-}
-
-
-
-/* =====================================================
-   ENCABEZADO LOGIN
-===================================================== */
-/* =====================================================
-   MODAL DE ESTADO FLOTANTE (ESTILO TOAST)
-   Este es el que aparece al registrarse o loguearse
-===================================================== */
-
-/* 1. El contenedor que cubre toda la pantalla */
-#status-container {
-    position: fixed;
-    top: 0;
-    left: 0;
+.tarjeta-registro,
+.tarjeta-blanca {
     width: 100%;
-    height: 100%;
-    /* Fondo semi-transparente */
-    background: rgba(255, 255, 255, 0.2); 
-    /* El efecto de desenfoque pixelado de fondo */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000; /* Siempre por encima de todo */
-    transition: all 0.3s ease;
-}
-
-/* 2. La cajita blanca central (basada en tu imagen) */
-.status-box {
+    max-width: 24rem;
     background: white;
-    padding: 2.5rem 2rem;
-    border-radius: 1.2rem;
-    text-align: center;
-    width: 280px;
-    /* Sombra suave para dar profundidad */
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    
-    /* Animación de entrada: aparece subiendo un poquito */
-    animation: aparecerStatus 0.4s ease-out forwards;
+    border-radius: 1.8rem;
+    overflow: hidden;
+    margin: auto;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    animation: fadeIn 0.4s ease;
 }
 
-/* 3. Tamaño de la rueda de carga y el check */
-#status-spinner {
-    width: 3.5rem;
-    height: 3.5rem;
-    border-width: 0.25em;
-}
-
-#status-check {
-    font-size: 3.5rem;
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-/* 4. Texto dentro de la cajita */
-#status-texto {
-    font-size: 1rem;
-    color: #374151;
-    margin-top: 1rem;
-}
-
-/* ===============================
-   ANIMACIONES
-=============================== */
-
-@keyframes aparecerStatus {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-/* Clase de utilidad para ocultar elementos */
-.d-none {
-    display: none !important;
-}
-.encabezado{
-
-    background:
-    linear-gradient(
-        135deg,
-        #5f9cff,
-        #6a5acd
-    );
-
-    color:white;
-
-    text-align:center;
-
-    padding:2rem 1rem;
-
-}
-
-.encabezado h1{
-
-    font-size:1.5rem;
-
-}
-
-
-
-/* =====================================================
-   FORMULARIOS
-===================================================== */
-
-.formulario{
-
-    padding:1.5rem;
-
-}
-
-#form-login {
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem; /* Espacio uniforme entre grupos de input */
-}
-
-.grupo-input{
-
-    margin-bottom:1.2rem;
-
-}
-
-.grupo-input label{
-
-    font-size:.9rem;
-
-    color:#555;
-
-    display:block;
-
-}
-
-.grupo-input input{
-
-    width:100%;
-
-    padding:.8rem;
-
-    margin-top:.4rem;
-
-    border-radius:.6rem;
-
-    border:1px solid #ccc;
-
-}
-
-
-
-/* =====================================================
-   BOTONES
-===================================================== */
-
-.boton-login,
-.boton-primario,
-.boton-registro{
-
-    width:100%;
-
-    padding:1rem;
-
-    border:none;
-
-    border-radius:.8rem;
-
-    background:#5f9cff;
-
-    color:white;
-
-    font-size:1rem;
-
-    cursor:pointer;
-
-    text-align:center;
-
-}
-
-.boton-login:active,
-.boton-primario:active,
-.boton-registro:active{
-
-    background:#4a85e0;
-
-}
-
-
-
-/* =====================================================
-   ENLACES
-===================================================== */
-
-.enlaces-extra{
-
-    text-align:center;
-
-    margin-top:1rem;
-
-}
-
-.enlaces-extra a{
-
-    color:#5f9cff;
-
-    text-decoration:none;
-
-}
-
-
-
-/* =====================================================
-   CAMPOS
-===================================================== */
-
-.campo{
-
-    display:flex;
-
-    flex-direction:column;
-
-    margin-bottom:1.3rem;
-
-}
-
-.campo input{
-
-    padding:1rem;
-
-    border-radius:.8rem;
-
-    border:1px solid #ddd;
-
-}
-
-
-
-/* =====================================================
-   REDES
-===================================================== */
-
-.redes-sociales{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:1.5rem;
-
-}
-
-.redes-sociales img{
-
-    width:2.2rem;
-
-}
-
-
-
-/* =====================================================
-   ENCABEZADO MENU
-===================================================== */
-
-.encabezado-menu{
-
-    background:
-    linear-gradient(
-        135deg,
-        #2563eb,
-        #7c3aed
-    );
-
-    color:white;
-
-    border-radius:0 0 24px 24px;
-
-    padding:1rem;
-
-}
-
-
-
-/* =====================================================
-   ESTADISTICAS
-===================================================== */
-
-.estadistica{
-
-    background:rgba(255,255,255,.15);
-
-    padding:.7rem;
-
-    border-radius:.8rem;
-
-    text-align:center;
-
-}
-
-
-
-/* =====================================================
-   TARJETAS MENU
-===================================================== */
-
-.tarjeta-accion{
-
-    border-radius:1rem;
-
-    border:1px solid #eee;
-
-    background:white;
-
-}
-
-.prioridad-alta{
-
-    border-left:4px solid red;
-
-}
-
-.prioridad-media{
-
-    border-left:4px solid orange;
-
-}
-
-.prioridad-baja{
-
-    border-left:4px solid green;
-
-}
-
-
-
-/* =====================================================
-   GRAFICA
-===================================================== */
-
-.grafica-circular{
-
-    width:10rem;
-
-    height:10rem;
-
-    margin:1rem auto;
-
-    border-radius:50%;
-
-    background:
-    conic-gradient(
-        #fbbf24 0% 40%,
-        #60a5fa 40% 70%,
-        #e2e8f0 70% 100%
-    );
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-}
-
-.grafica-centro{
-
-    width:7rem;
-
-    height:7rem;
-
-    background:white;
-
-    border-radius:50%;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-weight:bold;
-
-    font-size:1.5rem;
-
-}
-
-
-
-/* =====================================================
-   FOOTER
-===================================================== */
-
-.footer-app{
-
-    position:fixed;
-
-    bottom:0;
-
-    left:0;
-
-    width:100%;
-
-    text-align:center;
-
-    padding:.7rem;
-
-    font-size:.75rem;
-
-    color:white;
-
-    background:
-    linear-gradient(
-        135deg,
-        #5f9cff,
-        #6a5acd
-    );
-
-}
-
-
-
-/* =====================================================
-   BARRA INFERIOR MENU
-===================================================== */
-
-/* ============================= */
-/* NAVBAR INFERIOR PRO */
-/* ============================= */
-
-.barra-inferior-pro {
-
-position: fixed;
-bottom: 0;
-left: 0;
-width: 100%;
-
-height: 70px;
-
-display: flex;
-justify-content: space-around;
-align-items: center;
-
-background: rgba(255,255,255,0.95);
-
-backdrop-filter: blur(12px);
-
-border-top: 1px solid rgba(0,0,0,0.05);
-
-box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
-
-z-index: 1000;
-
-}
-
-
-
-.link-menu {
-
-flex: 1;
-
-text-align: center;
-
-text-decoration: none;
-
-color: #6b7280;
-
-font-size: 11px;
-
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-
-gap: 3px;
-
-transition: 0.2s;
-
-}
-
-
-
-.link-menu i {
-
-font-size: 20px;
-
-}
-
-
-
-.link-menu.activo {
-
-color: #2563eb;
-
-font-weight: 600;
-
-}
-
-
-
-.link-menu.activo i {
-
-transform: translateY(-2px);
-
-}
-
-
-
-.link-menu:active {
-
-transform: scale(0.95);
-
-}
-
-
-/* =====================================================
-   ANIMACION
-===================================================== */
-
-.fade{
-
-    animation:fadeIn .5s ease-out forwards;
-
-    opacity:0;
-
-}
-
-@keyframes fadeIn{
-
-    from{
-
-        opacity:0;
-        transform:translateY(20px);
-
-    }
-
-    to{
-
-        opacity:1;
-        transform:translateY(0);
-
-    }
-
-}
-/* =====================================================
-   AGENDA ESTILO APP 
-===================================================== */
-
-/* CONTENEDOR */
-.agenda-container{
-    max-width:430px;
-    margin:auto;
-    background:#f3f4f6;
-    min-height:100dvh;
-    padding-bottom:90px;
-}
-
-/* HEADER */
-.agenda-header{
-    background:linear-gradient(135deg,#2563eb,#9333ea);
-    color:white;
-    padding:1.5rem;
-    border-bottom-left-radius:1.5rem;
-    border-bottom-right-radius:1.5rem;
-}
-
-.agenda-header h1{
-    font-size:1.2rem;
-}
-
-.agenda-header p{
-    font-size:.8rem;
-    opacity:.8;
-}
-
-/* TARJETA SUPERIOR */
-.agenda-box{
-    background:rgba(255,255,255,0.15);
-    padding:1rem;
-    border-radius:1rem;
-    margin-top:1rem;
-}
-
-.agenda-box h2{
-    font-size:1.4rem;
-}
-
-/* TABS */
-.agenda-tabs{
-    display:flex;
-    margin:1rem;
-    background:#e5e7eb;
-    border-radius:2rem;
-    padding:.3rem;
-}
-
-.agenda-tabs button{
-    flex:1;
-    border:none;
-    background:transparent;
-    padding:.5rem;
-    border-radius:2rem;
-    font-size:.8rem;
-}
-
-.agenda-tabs .active{
-    background:white;
-}
-
-/* CARD */
-.agenda-card{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    background:white;
-    margin:1rem;
-    padding:1rem;
-    border-radius:1rem;
-}
-
-/* HORA */
-.agenda-time{
-    text-align:center;
-    margin-right:.8rem;
-}
-
-.agenda-time h3{
-    color:#2563eb;
-}
-
-.agenda-time span{
-    font-size:.7rem;
-}
-
-/* INFO */
-.agenda-info h4{
-    font-size:.9rem;
-}
-
-.agenda-info p{
-    font-size:.7rem;
-    color:#6b7280;
-}
-
-.agenda-tag{
-    font-size:.7rem;
-    background:#eee;
-    padding:.2rem .5rem;
-    border-radius:.5rem;
-}
-
-/* STATUS */
-.agenda-status{
-    font-size:.7rem;
-    padding:.3rem .6rem;
-    border-radius:1rem;
-}
-
-.match{
-    background:#d1fae5;
-    color:#065f46;
-}
-
-/* BOTON FLOTANTE */
-.agenda-fab{
-    position:fixed;
-    bottom:90px;
-    right:1.2rem;
-
-    width:3rem;
-    height:3rem;
-
-    border-radius:50%;
-    border:none;
-
-    background:#2563eb;
-    color:white;
-
-    font-size:1.5rem;
-}
-
-/* =====================================================
-   MODULO VACANTES 
-===================================================== */
-
-/* ===============================
-   EFECTO DE FONDO PIXELADO (BLUR) 
-
-===================================================== */
-.modal-backdrop {
-    /* Quitamos el negro sólido y ponemos un blanco muy transparente */
-    background-color: rgba(255, 255, 255, 0.3) !important; 
-    /* El truco del desenfoque */
-    backdrop-filter: blur(10px) saturate(150%);
-    -webkit-backdrop-filter: blur(10px) saturate(150%);
-    z-index: 1990 !important;
-}
-
-/* Para que el modal no se vea pegado a la pantalla, le damos un toque de cristal */
-.modal-content-app {
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* ===============================
-TARJETAS DE VACANTES
-=============================== */
-.job-card {
-    background: white;
-    border-radius: 1rem;
-    border: 1px solid #eee;
-    border-left: 0.4rem solid #cbd5e1;
-    padding: 1.2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: transform .2s;
-    margin-bottom: 1rem; /* Añadido para que no se peguen */
-}
-
-.job-card:active {
-    transform: scale(0.98);
-}
-
-.prioridad-high {
-    border-left-color: #ef4444 !important; /* Rojo para Alta */
-}
-
-.prioridad-medium {
-    border-left-color: #f59e0b !important; /* Naranja para Media */
-}
-
-.prioridad-low {
-    border-left-color: #10b981 !important; /* Verde para Baja */
-}
+.tarjeta-blanca { max-width: 28rem; padding: 2rem; }
+.tarjeta-registro { padding: 2rem; }
 
-/* ===============================
-BOTON FLOTANTE
-=============================== */
-.btn-flotante-accion {
-    position: fixed;
-    bottom: 5.5rem;
-    right: 1.5rem;
-    width: 3.8rem;
-    height: 3.8rem;
-    border-radius: 50%;
-    background: #2563eb;
+.encabezado {
+    background: var(--color-gradiente);
     color: white;
-    border: none;
-    font-size: 1.8rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
-    z-index: 1000;
+    text-align: center;
+    padding: 2rem 1.2rem 1.5rem 1.2rem;
+}
+.encabezado h1 { font-size: 1.4rem; margin-top: 0.5rem; }
+.encabezado p { font-size: 0.8rem; opacity: 0.9; }
+
+/* =====================================================
+   3. ENCABEZADOS DE LA APP (GLASSMORPHISM UNIFICADO)
+===================================================== */
+.encabezado-menu,
+.header-gradient,
+.agenda-header {
+    background: var(--color-gradiente);
+    color: white;
+    padding: 2rem 1.5rem 2.5rem 1.5rem;
+    border-bottom-left-radius: 2rem;
+    border-bottom-right-radius: 2rem;
+    position: relative;
+    overflow: hidden;
 }
 
-/* ===============================
-MODAL APP HIBRIDA
-=============================== */
-.modal {
-    z-index: 2000 !important;
+/* Forzar tamaño de números/datos principales */
+.stat-box-glass h3, 
+.estadistica span, 
+.agenda-box h2,
+.agenda-box h3 { 
+    font-size: 1.5rem !important; /* Tamaño grande y consistente */
+    font-weight: 700; 
+    margin-bottom: 0.1rem; 
+    display: block;
+    line-height: 1.2;
 }
 
-@media (max-width:576px){
-    .modal-dialog-bottom {
-        margin: 0;
-        display: flex;
-        align-items: flex-end;
-        min-height: 100%;
-    }
-
-    .modal-content-app {
-        border-radius: 1.5rem 1.5rem 0 0 !important;
-        border: none;
-        background: white;
-        max-height: 90vh;
-        overflow-y: auto;
-        padding-bottom: 6rem;
-    }
+/* Forzar tamaño de etiquetas/subtítulos */
+.stat-box-glass span, 
+.estadistica small, 
+.agenda-box span,
+.agenda-box small { 
+    font-size: 0.85rem !important; /* Aumentado ligeramente para legibilidad */
+    opacity: 0.9; 
+    font-weight: 500;
+    text-transform: capitalize;
 }
 
-/* ===============================
-FORMULARIO MODAL
-=============================== */
-.campo-app {
+.stat-box-glass, .estadistica, .agenda-box {
+    flex: 1;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 0.8rem 0.4rem;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
-    gap: .3rem;
-    margin-bottom: 1rem;
+    justify-content: center;
 }
 
-.campo-app label {
-    font-size: .8rem;
+/* =====================================================
+   4. FORMULARIOS E INPUTS
+===================================================== */
+.formulario { padding: 1.5rem 1.3rem; }
+
+#form-login { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.grupo-input, .campo, .campo-app {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.2rem;
+}
+
+.grupo-input label, .campo label, .campo-app label {
+    font-size: 0.8rem;
     font-weight: 600;
     color: #4b5563;
+    margin-bottom: 0.4rem;
 }
 
+.grupo-input input,
+.campo input,
 .campo-app input,
 .campo-app textarea,
 .campo-app select {
     width: 100%;
-    padding: .6rem .7rem;
-    border-radius: .5rem;
+    padding: 0.85rem;
+    border-radius: 0.7rem;
     border: 1px solid #e5e7eb;
-    font-size: .85rem;
-    background: #f9fafb; /* Color un poco más suave */
+    background: #f9fafb;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    outline: none;
 }
 
+.grupo-input input:focus,
 .campo-app input:focus,
 .campo-app textarea:focus,
 .campo-app select:focus {
-    border-color: #5f9cff;
-    box-shadow: 0 0 0 3px rgba(95,156,255,.15);
-    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     background: white;
 }
 
-.campo-app textarea {
-    resize: none;
-}
+.campo-app textarea { resize: none; }
 
-/* ===============================
-BOTON MODAL (CREAR Y ANALIZAR)
-=============================== */
+/* =====================================================
+   5. BOTONES Y ACCIONES
+===================================================== */
+.boton-login,
+.boton-registro,
 .boton-primario {
     width: 100%;
     padding: 1rem;
     border: none;
     border-radius: 1rem;
     color: white;
+    font-size: 1rem;
     font-weight: 600;
-    background: linear-gradient(135deg, #5f9cff, #6a5acd);
-    box-shadow: 0 6px 14px rgba(95,156,255,.3);
-    transition: all 0.3s ease;
+    background: var(--color-gradiente);
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.3);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s ease;
 }
 
+.boton-login:active,
+.boton-registro:active,
 .boton-primario:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 6px rgba(95,156,255,.2);
+    transform: translateY(2px) scale(0.98);
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
 }
 
-/* ===============================
-SCROLL SUAVE EN MODAL
-=============================== */
-.modal-content-app::-webkit-scrollbar {
-    width: 5px;
-}
+.enlaces-extra { text-align: center; margin-top: 1rem; }
+.enlaces-extra a { color: var(--color-primario); text-decoration: none; font-size: 0.8rem; }
 
-.modal-content-app::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-}
-
-/* =====================================================
-   ESTILOS ESPECÍFICOS DEL PERFIL
-===================================================== */
-
-/* Contenedores redondeados estilo iOS */
-.rounded-4 {
-    border-radius: 1.2rem !important;
-}
-
-/* Mini tarjetas de vacantes dentro del perfil */
-.mini-card-vacante {
-    background: white;
-    border-radius: 1rem;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid rgba(0,0,0,0.05);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.mini-card-vacante h6 {
-    font-size: 0.95rem;
-    margin-bottom: 2px;
-    color: #1f2937;
-}
-
-/* Botón de borrar vacante (Rojizo y minimalista) */
+/* Botones Mini (Eliminar en perfil) */
 .btn-borrar-mini {
     width: 38px;
     height: 38px;
@@ -1014,112 +226,328 @@ SCROLL SUAVE EN MODAL
     justify-content: center;
     transition: 0.2s;
 }
+.btn-borrar-mini:active { background: #ef4444; color: white; transform: scale(0.9); }
 
-.btn-borrar-mini:active {
-    background: #ef4444;
-    color: white;
-    transform: scale(0.9);
-}
-
-/* Foto de perfil con sombra */
-.encabezado-menu img {
-    background: white;
-}
-
-.list-group-item {
-    background: white;
-}
-#confirm-container, #confirm-baja-container {
+/* =====================================================
+   6. BOTONES FLOTANTES (FAB)
+===================================================== */
+.agenda-fab,
+.btn-flotante-accion {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    bottom: 90px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--color-gradiente);
+    color: white;
+    border: none;
+    font-size: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 6000; /* Por encima de todo */
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    z-index: 1040;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+.agenda-fab:active, .btn-flotante-accion:active { transform: scale(0.9); }
+
+/* =====================================================
+   7. TARJETAS (VACANTES, AGENDA, RANKING)
+===================================================== */
+.card,
+.agenda-card,
+.job-card,
+.tarjeta-accion,
+.mini-card-vacante {
+    background: white;
+    border-radius: 1.2rem;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--sombra-suave);
+    border: none;
+    transition: transform 0.2s ease, background-color 0.2s;
+    cursor: pointer;
 }
 
-/* Capa oscura de fondo */
-.sheet-overlay {
+.card:active,
+.agenda-card:active,
+.job-card:active,
+.tarjeta-accion:active {
+    transform: scale(0.97);
+    background: #f1f5f9;
+}
+
+/* Indicadores de Prioridad (Borde izquierdo) */
+.prioridad-high, .prioridad-alta { border-left: 5px solid #ef4444 !important; }
+.prioridad-medium, .prioridad-media { border-left: 5px solid #f59e0b !important; }
+.prioridad-low, .prioridad-baja { border-left: 5px solid #10b981 !important; }
+
+/* TABS (Agenda) */
+.agenda-tabs {
+    display: flex;
+    background: #e5e7eb;
+    border-radius: 999px;
+    padding: 0.3rem;
+    margin-bottom: 1.5rem;
+}
+.tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.6rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--texto-claro);
+    transition: all 0.3s ease;
+}
+.tab-btn.active {
+    background: var(--color-gradiente) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* =====================================================
+   8. MENÚ INFERIOR (BOTTOM NAVBAR)
+===================================================== */
+.barra-inferior-pro {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 75px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.link-menu {
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
+    color: var(--texto-claro);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    transition: 0.2s;
+}
+
+.link-menu i { font-size: 22px; }
+.link-menu span { font-size: 10px; }
+.link-menu.activo { color: var(--color-primario); font-weight: 600; }
+.link-menu.activo i { transform: translateY(-2px); }
+.link-menu:active { transform: scale(0.95); }
+
+/* =====================================================
+   9. MODALES, OVERLAYS Y STATUS PRO
+===================================================== */
+/* Backdrop y capa base */
+.modal-backdrop, .sheet-overlay {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(4px);
+    z-index: 1050 !important;
+}
+
+.modal { z-index: 1060 !important; }
+
+/* Contenedor del Modal (Redondeado estilo App) */
+.modal-content-app {
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    background: white;
+    border: none;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding-bottom: 2rem;
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+}
+
+.sheet-handle {
+    width: 40px;
+    height: 5px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    margin: 0.5rem auto 1rem auto;
+}
+
+/* Status Loader Centrado (Cuando creas vacantes) */
+#status-container {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 5000;
-    backdrop-filter: blur(4px);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    transition: all 0.3s ease;
 }
 
-/* La ventana que sube */
+.status-box {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 1.5rem;
+    text-align: center;
+    width: 260px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    animation: aparecerStatus 0.4s ease-out forwards;
+}
+
+/* Scrollbar personalizada para modales largos */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+/* =====================================================
+   10. ANIMACIONES
+===================================================== */
+.fade { animation: fadeIn 0.4s ease-out forwards; opacity: 1; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes aparecerStatus {
+    from { opacity: 0; transform: translateY(20px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* =====================================================
+   11. RESPONSIVE Y FIXES MÓVILES
+===================================================== */
+@media (max-width: 576px) {
+    .modal-dialog-bottom {
+        margin: 0;
+        display: flex;
+        align-items: flex-end;
+        min-height: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .header-gradient, .encabezado-menu { padding: 1.5rem 1rem 2.5rem 1rem; }
+    .stat-box-glass h3 { font-size: 1.2rem; }
+    .tarjeta-login { border-radius: 1.4rem; padding: 1.5rem; }
+    .encabezado h1 { font-size: 1.2rem; }
+}
+
+.footer-app {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: white; /* Para que resalte sobre el fondo azul/morado */
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+/* =====================================================
+   12. MODALES ESPECÍFICOS DEL PERFIL (BOTTOM SHEET Y ALERTAS)
+===================================================== */
+
+/* Contenedores de alerta flotantes a pantalla completa */
+#confirm-container, 
+#confirm-baja-container {
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6000; /* Siempre por encima de todo */
+}
+
+/* Capa oscura detrás del menú corredizo */
+.sheet-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 5000;
+}
+
+/* La ventana corrediza (Bottom Sheet) */
 .bottom-sheet {
     position: fixed;
-    bottom: -100%; /* Empieza escondida abajo */
+    bottom: -120%; /* Empieza escondida completamente abajo */
     left: 0;
     width: 100%;
     background: white;
     border-radius: 2rem 2rem 0 0;
     z-index: 5001;
     transition: bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.15);
 }
 
-/* Cuando se activa */
+/* Clase mágica que el JavaScript activa para subir la ventana */
 .bottom-sheet.active {
     bottom: 0;
 }
 
-/* Rayita gris para "arrastrar" (estilo iPhone) */
-.sheet-handle {
-    width: 40px;
-    height: 5px;
-    background: #e5e7eb;
-    border-radius: 10px;
-    margin: 10px auto;
-}
-
+/* Encabezado del Bottom Sheet */
 .sheet-header {
     text-align: center;
     border-bottom: 1px solid #f3f4f6;
     padding-bottom: 10px;
+    padding-top: 5px;
 }
 
-/* AJUSTES PARA EL MÓDULO DE DETALLE vacantes */
-
-/* Evita que los nombres largos de candidatos rompan el diseño en móvil */
-.tarjeta-accion h6 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 160px; /* Ajustado para pantallas de 375px o 414px */
+/* =====================================================
+   ESTILO DE MINI TARJETAS DE VACANTES (PERFIL)
+===================================================== */
+.mini-card-vacante {
+    display: flex;
+    justify-content: space-between; /* Empuja el texto a la izquierda y el icono a la derecha */
+    align-items: center;
+    background: white;
+    padding: 1rem 1.2rem;
+    border-radius: 1rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    /* Borde rojo suave para indicar que son elementos eliminables */
+    border: 1.5px solid rgba(220, 38, 38, 0.2); 
+    transition: all 0.2s ease;
 }
 
-/* Efecto de clic en las tarjetas de ranking */
-.tarjeta-accion:active {
-    background-color: #f1f5f9;
+.mini-card-vacante:active {
     transform: scale(0.98);
+    background: #fff5f5; /* Un tono rojizo muy leve al tocar */
+    border-color: rgba(220, 38, 38, 0.5);
 }
 
-/* Espaciado para que el encabezado no oculte el contenido */
-.encabezado-menu {
-    border-radius: 0 0 2rem 2rem;
-    padding-bottom: 2rem;
+.btn-borrar-mini {
+    background: #fee2e2; /* Fondo rojo muy claro para el botón */
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #dc2626; /* Color del icono de basura (Rojo fuerte) */
+    transition: all 0.2s ease;
 }
 
-/* Ajuste del contador de candidatos en el encabezado */
-.agenda-box {
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(5px);
-}
-
-.job-card {
-    cursor: pointer;
-    transition: transform 0.1s ease, background-color 0.2s;
-}
-
-/* Efecto visual cuando el dedo toca la pantalla (estilo PWA) */
-.job-card:active {
-    transform: scale(0.96) !important;
-    background-color: #f8fafc;
+.btn-borrar-mini i {
+    font-size: 1.2rem;
 }

@@ -120,8 +120,12 @@ function pintarRanking(candidatos) {
             </div>
         `;
         
-        // Agregar evento para ver detalle del candidato si lo deseas en el futuro
+        // --- rederijie a la nuevo detalle---
         card.style.cursor = "pointer";
+        card.onclick = () => {
+            window.location.href = `detalle_candidato.html?id=${cand.id}`;
+        };
+        // ---------------------------
         
         lista.appendChild(card);
     });

@@ -4,7 +4,7 @@
 ===================================================== */
 
 const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
-const PUBLIC_VAPID_KEY = "BHoEUkzRM2Q1dV--9491i3Z3dBpFpDQL1DkSW6EmyUK7s7NltbaKm89p1up6-vVG87t3TaGvoUzysmut_5wsddk";
+const PUBLIC_VAPID_KEY = "BI_lRYve2woqTrvcOsCfyGGyxIuOEtTYOeze1pYJswGfLZ3qyEJBK2xLf5dqkJoULJe5CTAZAdn6OD84P2ICHAc";
 
 /* --- UTILIDAD: Conversión de llave VAPID --- */
 function urlBase64ToUint8Array(base64String) {

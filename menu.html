@@ -79,7 +79,22 @@
                 </div>
             </div>
         </div>
-
+        <div class="row g-3 mb-4">
+    <div class="col-6">
+        <div class="card border-0 shadow-sm rounded-4 text-center p-3 h-100">
+            <i class="bi bi- lightning-charge text-warning mb-2 fs-3"></i>
+            <h6 class="small text-muted mb-1">Ahorro Tiempo</h6>
+            <div class="fw-bold text-dark" id="tiempoAhorrado">-- h</div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card border-0 shadow-sm rounded-4 text-center p-3 h-100">
+            <i class="bi bi-stars text-primary mb-2 fs-3"></i>
+            <h6 class="small text-muted mb-1">Precisión IA</h6>
+            <div class="fw-bold text-dark" id="precisionIA">--%</div>
+        </div>
+    </div>
+</div>
   
     </main>
 
@@ -140,7 +155,9 @@
             // Corregido: Buscar entrevistas dentro del objeto 'proceso'
             document.getElementById("datoEntrevistas").textContent = (data.proceso && data.proceso.entrevistas) ? data.proceso.entrevistas : "0";
             document.getElementById("datoMatch").textContent = (data.match || "0") + "%";
-
+            //uso de el tiempo ahorrado y precision para agregar el dashboard 
+document.getElementById("tiempoAhorrado").textContent = data.tiempoAhorrado || "0h";
+    document.getElementById("precisionIA").textContent = data.precisionIA || "0%";
             // Asegurarnos de que no falle si el backend manda 1 o 0 acciones
             const txtAccion1 = (data.acciones && data.acciones.length > 0) ? data.acciones[0] : "Todo al día";
             const txtAccion2 = (data.acciones && data.acciones.length > 1) ? data.acciones[1] : "Esperando nuevos candidatos";

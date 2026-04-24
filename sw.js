@@ -1,98 +1,95 @@
-/* =====================================================
-   SW.JS - SERVICE WORKER DE NOTIFICACIONES (MarkNica AI)
-   Este archivo debe estar en la RAÍZ de tu proyecto.
-===================================================== */
+/**
+ * =====================================================
+ * SW.JS - GESTION DE NOTIFICACIONES PUSH Y CICLO DE VIDA
+ * Proyecto: MarkNica Recruiting AI
+ * Ubicacion: Raiz del proyecto (/)
+ * =====================================================
+ */
 
-// 1. EVENTO: RECEPCIÓN DE NOTIFICACIÓN PUSH
-// Este evento se dispara cuando el servidor de Google/Apple envía el mensaje
+/**
+ * Evento: push
+ * Descripcion: Se activa al recibir un mensaje push del servidor.
+ * Procesa el payload JSON y muestra la notificacion visual.
+ */
 self.addEventListener("push", function (event) {
   let payload = {};
 
   try {
-    // Intentamos extraer el JSON enviado por FastAPI
+    // Extraccion de datos JSON enviados desde el backend (FastAPI)
     payload = event.data ? event.data.json() : {};
-  } catch (e) {
-    console.warn("Recibido push sin JSON válido, usando valores por defecto.");
+  } catch (error) {
+    console.error("Error al procesar el payload de la notificacion:", error);
   }
 
-  // Configuración de la apariencia de la notificación
-  const title = payload.title || "Nueva actualización en MarkNica";
-  const options = {
-    body: payload.body || "Tienes novedades en tu cuenta de reclutador.",
-    icon: "/assets/icon-192.png", // Icono de la notificación
-    badge: "/assets/icon-192.png", // Icono pequeño para la barra de estado
-    vibrate: [200, 100, 200], // Patrón de vibración en móviles
-
-    // Datos adicionales para usar cuando el usuario haga clic
+  const title = payload.title || "Notificacion de MarkNica";
+  const notificationOptions = {
+    body: payload.body || "Usted tiene una nueva actualizacion en su cuenta.",
+    icon: "/assets/icon-192.png",
+    badge: "/assets/icon-192.png",
+    vibrate: [200, 100, 200],
+    // Almacenamiento de metadatos para recuperacion posterior en el clic
     data: {
-      url: payload.url || "/vacantes.html",
+      url: payload.url || "/menu.html"
     },
-
-    // Botones de acción rápida dentro de la notificación
+    // Definicion de acciones rapidas compatibles con dispositivos moviles
     actions: [
-      { action: "open", title: "Ver ahora" },
-      { action: "close", title: "Cerrar" },
-    ],
+      { action: "open", title: "Abrir Aplicacion" }
+    ]
   };
 
-  // waitUntil asegura que el Service Worker no se "duerma" antes de mostrar la notificación
-  event.waitUntil(self.registration.showNotification(title, options));
-});
-
-/* =====================================================
-   2. EVENTO: CLIC EN LA NOTIFICACIÓN
-   Define qué pasa cuando el usuario toca la notificación
-===================================================== */
-self.addEventListener("notificationclick", function (event) {
-  event.notification.close();
-
-  const urlToOpen = event.notification.data?.url || "/agenda.html";
-
   event.waitUntil(
-    clients.openWindow(urlToOpen)
+    self.registration.showNotification(title, notificationOptions)
   );
 });
 
-
-/* self.addEventListener("notificationclick", function (event) {
+/**
+ * Evento: notificationclick
+ * Descripcion: Gestiona la interaccion del usuario con la notificacion.
+ * Implementa logica de enfoque de ventana existente para evitar duplicidad de pestañas.
+ */
+self.addEventListener("notificationclick", function (event) {
+  // Cierre inmediato de la notificacion para mejorar la experiencia de usuario
   event.notification.close();
 
-  if (event.action === "close") return;
-
-  const urlToOpen = new URL(
-    event.notification.data?.url || "/agenda.html",
+  // Construccion de URL absoluta basada en el origen de la aplicacion
+  const targetUrl = new URL(
+    event.notification.data.url || "/menu.html",
     self.location.origin
   ).href;
 
   event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientsArr) => {
-
-      // Buscar si hay una pestaña abierta
-      for (let client of clientsArr) {
-        if ("focus" in client) {
-          return client.focus(); // 
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      // Intento de localizar una ventana abierta con la misma URL
+      for (const client of clientList) {
+        if (client.url === targetUrl && "focus" in client) {
+          return client.focus();
         }
       }
 
-      //  Si no hay pestañas → abrir nueva
+      // En caso de no existir ventanas activas, se procede a abrir una nueva instancia
       if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
+        return clients.openWindow(targetUrl);
       }
     })
   );
-});*/
-/* =====================================================
-   3. EVENTO: INSTALACIÓN Y ACTIVACIÓN
-   Ayuda a que el SW tome el control de la página de inmediato
-===================================================== */
-self.addEventListener("install", (event) => {
-  // Forzamos al SW a convertirse en el SW activo
-  self.skipWaiting();
-  console.log("Service Worker Instalado");
 });
 
+/**
+ * Evento: install
+ * Descripcion: Se ejecuta durante la instalacion del Service Worker.
+ * Fuerza la activacion inmediata mediante skipWaiting.
+ */
+self.addEventListener("install", (event) => {
+  self.skipWaiting();
+  console.log("SISTEMA: Service Worker instalado satisfactoriamente.");
+});
+
+/**
+ * Evento: activate
+ * Descripcion: Se ejecuta tras la instalacion exitosa.
+ * Toma el control de todos los clientes de forma inmediata mediante clients.claim.
+ */
 self.addEventListener("activate", (event) => {
-  // Tomamos el control de todas las pestañas abiertas inmediatamente
   event.waitUntil(clients.claim());
-  console.log("Service Worker Activado y listo para recibir Push");
+  console.log("SISTEMA: Service Worker activado y en control de los clientes.");
 });

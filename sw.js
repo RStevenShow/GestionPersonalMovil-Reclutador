@@ -43,7 +43,7 @@ self.addEventListener("push", function (event) {
    2. EVENTO: CLIC EN LA NOTIFICACIÓN
    Define qué pasa cuando el usuario toca la notificación
 ===================================================== */
-/*self.addEventListener("notificationclick", function (event) {
+self.addEventListener("notificationclick", function (event) {
   event.notification.close();
 
   const urlToOpen = event.notification.data?.url || "/agenda.html";
@@ -51,10 +51,10 @@ self.addEventListener("push", function (event) {
   event.waitUntil(
     clients.openWindow(urlToOpen)
   );
-});*/
+});
 
 
-self.addEventListener("notificationclick", function (event) {
+/* self.addEventListener("notificationclick", function (event) {
   event.notification.close();
 
   if (event.action === "close") return;
@@ -80,7 +80,7 @@ self.addEventListener("notificationclick", function (event) {
       }
     })
   );
-});
+});*/
 /* =====================================================
    3. EVENTO: INSTALACIÓN Y ACTIVACIÓN
    Ayuda a que el SW tome el control de la página de inmediato

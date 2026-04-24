@@ -79,23 +79,28 @@
                 </div>
             </div>
         </div>
-        <div class="row g-3 mb-4">
-    <div class="col-6">
-        <div class="card border-0 shadow-sm rounded-4 text-center p-3 h-100">
-            <i class="bi bi- lightning-charge text-warning mb-2 fs-3"></i>
-            <h6 class="small text-muted mb-1">Ahorro Tiempo</h6>
-            <div class="fw-bold text-dark" id="tiempoAhorrado">-- h</div>
+
+        <div class="container mt-4 px-0">
+            <h5 class="fw-bold text-dark mb-3">Ranking por Vacante</h5>
+            <div id="contenedor-vacantes-ranking"></div>
         </div>
-    </div>
-    <div class="col-6">
-        <div class="card border-0 shadow-sm rounded-4 text-center p-3 h-100">
-            <i class="bi bi-stars text-primary mb-2 fs-3"></i>
-            <h6 class="small text-muted mb-1">Precisión IA</h6>
-            <div class="fw-bold text-dark" id="precisionIA">--%</div>
-        </div>
-    </div>
-</div>
-  
+
+        <template id="temp-vacante">
+            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold mb-0 text-primary titulo-vacante">Nombre de la Vacante</h6>
+                        <small class="text-muted small">Top 3 candidatos</small>
+                    </div>
+                    <div class="form-check form-switch custom-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                        <label class="form-check-label small fw-bold text-muted">IA / Entrevista</label>
+                    </div>
+                </div>
+                <div class="card-body p-3 lista-talentos">
+                    </div>
+            </div>
+        </template>
     </main>
 
     <nav class="barra-inferior-pro">
@@ -104,123 +109,232 @@
         <a href="agenda.html" class="link-menu"><i class="bi bi-calendar"></i><span>Agenda</span></a>
         <a href="perfil.html" class="link-menu"><i class="bi bi-person"></i><span>Perfil</span></a>
     </nav>
- 
+
     <script>
-        const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
-        const token = localStorage.getItem('token');
-        let graficoReferencia = null;
+const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
+const token = localStorage.getItem('token');
+let graficoReferencia = null;
 
-        if (!token) {
-            window.location.href = "Login.html";
-        }
+if (!token) {
+    window.location.href = "Login.html";
+}
 
-        document.addEventListener('DOMContentLoaded', () => {
-            obtenerDatosDashboard();
+document.addEventListener('DOMContentLoaded', () => {
+    obtenerDatosDashboard();
+    cargarRankingVacantes();
+});
+
+// ===============================
+// 🔹 DASHBOARD STATS
+// ===============================
+async function obtenerDatosDashboard() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard-stats`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
 
-        async function obtenerDatosDashboard() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/dashboard-stats`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
+        if (response.status === 401) {
+            cerrarSesion();
+            return;
+        }
+
+        if (!response.ok) throw new Error("Error en servidor");
+
+        const data = await response.json();
+        console.log("DATA DASHBOARD:", data);
+
+        renderizarPantalla(data);
+
+    } catch (error) {
+        console.error("Error:", error);
+
+        document.getElementById("nombreApp").textContent = "Modo Offline";
+        document.getElementById("accion1").innerHTML =
+            `<i class="bi bi-wifi-off text-danger fs-5 me-3"></i> <span>Despertando servidor...</span>`;
+        document.getElementById("accion2").innerHTML =
+            `<i class="bi bi-arrow-clockwise text-primary fs-5 me-3"></i> <span>Reintentando conexión</span>`;
+    }
+}
+
+// ===============================
+// 🔹 RENDER UI
+// ===============================
+function renderizarPantalla(data) {
+    document.getElementById("nombreApp").textContent = data.appNombre || "MarkNica AI";
+    document.getElementById("datoCandidatos").textContent = data.candidatos || 0;
+    document.getElementById("datoEntrevistas").textContent =
+        data.proceso?.entrevistas || 0;
+    document.getElementById("datoMatch").textContent =
+        (data.match || 0) + "%";
+
+    const txtAccion1 = data.acciones?.[0] || "Todo al día";
+    const txtAccion2 = data.acciones?.[1] || "Sin novedades";
+
+    document.getElementById("accion1").innerHTML =
+        `<i class="bi bi-briefcase text-danger fs-5 me-3"></i><span>${txtAccion1}</span>`;
+
+    document.getElementById("accion2").innerHTML =
+        `<i class="bi bi-calendar-check text-warning fs-5 me-3"></i><span>${txtAccion2}</span>`;
+
+    dibujarGrafico(data.proceso || {});
+}
+
+// ===============================
+// 🔹 GRAFICO PIPELINE REAL
+// ===============================
+function dibujarGrafico(proceso) {
+    const canvas = document.getElementById("graficoProceso");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    if (graficoReferencia) graficoReferencia.destroy();
+
+    // 🔥 DATOS REALES DEL BACKEND
+    const screening = proceso.screening || 0;        // CVs sin entrevista
+    const entrevistas = proceso.entrevistas || 0;    // Entrevistas creadas
+    const evaluados = proceso.oferta || 0;           // Entrevistas completadas
+    const top = proceso.contratados || 0;            // Mejores candidatos
+
+    const total = screening + entrevistas + evaluados + top;
+
+    const datos = total === 0
+        ? [1]
+        : [screening, entrevistas, evaluados, top];
+
+    const etiquetas = total === 0
+        ? ["Sin datos"]
+        : [
+            "CV sin revisar",
+            "Entrevistas",
+            "Evaluados",
+            "Top candidatos"
+        ];
+
+    const colores = total === 0
+        ? ["#e2e8f0"]
+        : [
+            "#f59e0b", // amarillo
+            "#3b82f6", // azul
+            "#8b5cf6", // morado
+            "#10b981"  // verde
+        ];
+
+    graficoReferencia = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: etiquetas,
+            datasets: [{
+                data: datos,
+                backgroundColor: colores,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "75%",
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true,
+                        font: { size: 11 }
                     }
-                });
-
-                if (response.status === 401) {
-                    cerrarSesion();
-                    return;
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw}`;
+                        }
+                    }
                 }
-
-                if (!response.ok) throw new Error("Error en la respuesta del servidor");
-
-                const data = await response.json();
-                renderizarPantalla(data);
-
-            } catch (error) {
-                console.error("Error:", error);
-                document.getElementById("nombreApp").textContent = "Modo Offline";
-                document.getElementById("accion1").innerHTML = `<i class="bi bi-wifi-off text-danger fs-5 me-3"></i> <span class="text-secondary">Despertando servidor...</span>`;
-                document.getElementById("accion2").innerHTML = `<i class="bi bi-arrow-clockwise text-primary fs-5 me-3"></i> <span class="text-secondary">Reintentando conexión.</span>`;
-                
-                setTimeout(obtenerDatosDashboard, 5000);
             }
         }
+    });
+}
 
-        function renderizarPantalla(data) {
-            document.getElementById("nombreApp").textContent = data.appNombre || "MarkNica AI";
-            document.getElementById("datoCandidatos").textContent = data.candidatos || "0";
-            
-            // Corregido: Buscar entrevistas dentro del objeto 'proceso'
-            document.getElementById("datoEntrevistas").textContent = (data.proceso && data.proceso.entrevistas) ? data.proceso.entrevistas : "0";
-            document.getElementById("datoMatch").textContent = (data.match || "0") + "%";
-            //uso de el tiempo ahorrado y precision para agregar el dashboard 
-document.getElementById("tiempoAhorrado").textContent = data.tiempoAhorrado || "0h";
-    document.getElementById("precisionIA").textContent = data.precisionIA || "0%";
-            // Asegurarnos de que no falle si el backend manda 1 o 0 acciones
-            const txtAccion1 = (data.acciones && data.acciones.length > 0) ? data.acciones[0] : "Todo al día";
-            const txtAccion2 = (data.acciones && data.acciones.length > 1) ? data.acciones[1] : "Esperando nuevos candidatos";
+// ===============================
+// 🔹 RANKING VACANTES
+// ===============================
+async function cargarRankingVacantes() {
+    const contenedor = document.getElementById('contenedor-vacantes-ranking');
 
-            document.getElementById("accion1").innerHTML = `<i class="bi bi-exclamation-circle text-danger fs-5 me-3"></i> <span class="text-secondary fw-medium">${txtAccion1}</span>`;
-            document.getElementById("accion2").innerHTML = `<i class="bi bi-robot text-warning fs-5 me-3"></i> <span class="text-secondary fw-medium">${txtAccion2}</span>`;
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard-vacantes-ranking`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-            dibujarGrafico(data.proceso || {});
-        }
+        const data = await response.json();
+        contenedor.innerHTML = '';
 
-        function dibujarGrafico(proceso) {
-            const canvas = document.getElementById("graficoProceso");
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            
-            if (graficoReferencia) { graficoReferencia.destroy(); }
+        data.vacantes.forEach(vacante => {
+            const temp = document.getElementById('temp-vacante').content.cloneNode(true);
+            temp.querySelector('.titulo-vacante').innerText = vacante.titulo;
 
-            const screening = proceso.screening || 0;
-            const entrevistas = proceso.entrevistas || 0;
-            const oferta = proceso.oferta || 0;
-            const contratados = proceso.contratados || 0;
+            const switchInput = temp.querySelector('.form-check-input');
+            switchInput.setAttribute(
+                'onchange',
+                `renderizarListaTalentos('${vacante.id}', this.checked)`
+            );
 
-            // Si todos son cero, mostrar un anillo gris
-            const total = screening + entrevistas + oferta + contratados;
-            const datos = total === 0 ? [1] : [screening, entrevistas, oferta, contratados];
-            const colores = total === 0 ? ["#e2e8f0"] : ["#f59e0b", "#3b82f6", "#8b5cf6", "#10b981"];
-            const etiquetas = total === 0 ? ["Sin datos"] : ["Screening", "Entrevistas", "Oferta", "Contratados"];
+            window[`candidatos_${vacante.id}`] = vacante.candidatos;
 
-            graficoReferencia = new Chart(ctx, {
-                type: "doughnut",
-                data: {
-                    labels: etiquetas,
-                    datasets: [{
-                        data: datos,
-                        backgroundColor: colores,
-                        hoverOffset: 4,
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { 
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                font: { size: 12, family: "system-ui" }
-                            }
-                        }
-                    },
-                    cutout: '75%'
-                }
-            });
-        }
+            const listaBody = temp.querySelector('.lista-talentos');
+            listaBody.id = `lista-${vacante.id}`;
 
-        function cerrarSesion() {
-            localStorage.removeItem('token');
-            window.location.href = "Login.html";
-        }
-    </script>
- 
+            contenedor.appendChild(temp);
+            renderizarListaTalentos(vacante.id, false);
+        });
+
+    } catch (error) {
+        console.error("Error cargando ranking:", error);
+    }
+}
+
+// ===============================
+// 🔹 LISTA TALENTOS
+// ===============================
+function renderizarListaTalentos(vacanteId, porEntrevista) {
+    const listaBody = document.getElementById(`lista-${vacanteId}`);
+    let candidatos = [...window[`candidatos_${vacanteId}`]];
+
+    if (porEntrevista) {
+        candidatos.sort((a, b) =>
+            (b.calificacion_entrevista || 0) - (a.calificacion_entrevista || 0)
+        );
+    } else {
+        candidatos.sort((a, b) => b.match_score - a.match_score);
+    }
+
+    listaBody.innerHTML = candidatos.slice(0, 3).map((c, index) => `
+        <div class="talento-item d-flex align-items-center py-2 border-bottom ${index === 0 ? 'top-1' : ''}">
+            <div class="posicion-top me-3 fw-bold ${index === 0 ? 'text-primary' : 'text-muted'}">#${index + 1}</div>
+            <div class="flex-grow-1">
+                <h6 class="mb-0 small fw-bold text-dark">${c.nombre}</h6>
+                <small class="text-muted">${c.email}</small>
+            </div>
+            <div class="text-end">
+                <span class="fw-bold ${porEntrevista ? 'text-success' : 'text-primary'}">
+                    ${porEntrevista 
+                        ? (c.calificacion_entrevista || '--') + ' pts'
+                        : Math.round(c.match_score) + '%'}
+                </span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===============================
+// 🔹 LOGOUT
+// ===============================
+function cerrarSesion() {
+    localStorage.removeItem('token');
+    window.location.href = "Login.html";
+}
+</script>
 </body>
-
 </html>

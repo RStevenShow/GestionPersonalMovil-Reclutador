@@ -44,53 +44,26 @@ self.addEventListener("push", function (event) {
    Define qué pasa cuando el usuario toca la notificación
 ===================================================== */
 self.addEventListener("notificationclick", function (event) {
-  // Cerramos la notificación inmediatamente
   event.notification.close();
-  //si no le da clicl no hacemos nada
+
   if (event.action === "close") return;
-  // Extraer la URL de destino del payload de la notificación
+
   const urlToOpen = event.notification.data?.url || "/agenda.html";
 
   event.waitUntil(
-    clients
-      .matchAll({ type: "window", includeUncontrolled: true })
-      .then(function (windowClients) {
-        // Si ya hay una ventana abierta, la enfocamos y redirigimos
-        for (var i = 0; i < windowClients.length; i++) {
-          var client = windowClients[i];
-          if (client.url.includes(registration.scope) && "focus" in client) {
-            client.navigate(urlToOpen);
-            return client.focus();
-          }
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientsArr) => {
+      for (let client of clientsArr) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          client.focus();
+          client.navigate(urlToOpen);
+          return;
         }
-        // Si no hay ventanas abiertas, abrimos una nueva
-        if (clients.openWindow) {
-          return clients.openWindow(urlToOpen);
-        }
-      }),
-  );
-  // Si el usuario hizo clic en el botón 'Cerrar', no hacemos nada más
+      }
 
-  // Obtenemos la URL de destino que enviamos desde el backend
-  const urlADirigir = event.notification.data.url;
-
-  event.waitUntil(
-    // Buscamos si hay alguna pestaña de nuestra App ya abierta
-    clients
-      .matchAll({ type: "window", includeUncontrolled: true })
-      .then((windowClients) => {
-        // Si ya hay una pestaña abierta con esa URL -> la enfocamos
-        for (let client of windowClients) {
-          if (client.url.includes(urlADirigir) && "focus" in client) {
-            return client.focus();
-          }
-        }
-
-        // Si no hay pestañas abiertas -> abrimos una nueva
-        if (clients.openWindow) {
-          return clients.openWindow(urlADirigir);
-        }
-      }),
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
   );
 });
 

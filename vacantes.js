@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inputBusqueda) inputBusqueda.addEventListener('input', filtrarVacantes);
 });
 
-// 1. OBTENER DATOS REALES DESDE RENDER / SUPABASE
+// 1. OBTENER DATOS
 async function obtenerVacantes() {
     const token = localStorage.getItem('token'); 
     if (!token) return window.location.href = "Login.html";
@@ -40,7 +40,7 @@ async function obtenerVacantes() {
     }
 }
 
-// 2. RENDERIZAR TARJETAS
+// 2. RENDERIZAR
 function renderizarVacantes(vacantes) {
     const contenedor = document.getElementById('vacantes-list');
     if (!contenedor) return;
@@ -52,52 +52,66 @@ function renderizarVacantes(vacantes) {
         return;
     }
 
+    let totalCandidatos = 0;
+    let vacantesCerradas = 0;
+
     vacantes.forEach(v => {
         const tarjeta = document.createElement('div');
-        // Clase dinámica según prioridad (prioridad-high, prioridad-medium, prioridad-low)
         tarjeta.className = `job-card shadow-sm mb-3 prioridad-${v.priority || 'medium'}`;
-        
         tarjeta.style.cursor = "pointer";
-        tarjeta.onclick = () => irADetalle(v.id);
-        
+
+        const estado = v.estado || "abierta";
+        const llena = estado === "cerrada";
+
+        if (llena) vacantesCerradas++;
+
         const numCandidatos = v.candidates ? v.candidates.length : 0;
+        totalCandidatos += numCandidatos;
+
+        tarjeta.onclick = () => {
+    irADetalle(v.id);
+};
 
         tarjeta.innerHTML = `
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <div>
                     <h3 class="h6 fw-bold mb-0 text-dark">${v.title}</h3>
-                    <small class="text-muted"><i class="bi bi-geo-alt"></i> ${v.location || 'Nicaragua'}</small>
+                    <small class="text-muted">
+                        <i class="bi bi-geo-alt"></i> ${v.location || 'Nicaragua'}
+                    </small>
                 </div>
-                <i class="bi bi-chevron-right text-muted"></i>
+                ${llena ? '<span class="badge bg-danger">Vacante Llena</span>' : ''}
             </div>
+
             <div class="d-flex gap-3 mb-2 small text-secondary">
-                <span><i class="bi bi-briefcase text-primary"></i> ${v.experience_years} años exp.</span>
-                <span><i class="bi bi-people"></i> ${numCandidatos} Aplicantes</span>
+                <span><i class="bi bi-briefcase text-primary"></i> ${v.experience_years} años</span>
+                <span><i class="bi bi-people"></i> ${numCandidatos}/${v.max_candidatos}</span>
             </div>
+
             <div class="badge bg-light text-primary border-0 small">
-               <i class="bi bi-cash-stack"></i> ${v.salary_range || 'Sueldo a convenir'}
+                <i class="bi bi-cash-stack"></i> ${v.salary_range || 'Sueldo a convenir'}
             </div>
         `;
+
         contenedor.appendChild(tarjeta);
     });
 
-    // Actualizar contadores superiores en el Dashboard
+    // STATS
     const statAbiertas = document.getElementById('stat-abiertas');
     const statCandidatos = document.getElementById('stat-candidatos');
-    
+    const statLlenas = document.getElementById('stat-llenas');
+
     if (statAbiertas) statAbiertas.innerText = vacantes.length;
-    if (statCandidatos) {
-        const totalCand = vacantes.reduce((acc, v) => acc + (v.candidates ? v.candidates.length : 0), 0);
-        statCandidatos.innerText = totalCand;
-    }
+    if (statCandidatos) statCandidatos.innerText = totalCandidatos;
+    if (statLlenas) statLlenas.innerText = `${vacantesCerradas}/${vacantes.length}`;
 }
 
-// 3. FUNCIÓN DE NAVEGACIÓN (Entrar al Ranking IA)
+// 3. NAVEGACIÓN
 function irADetalle(id) {
     window.location.href = `detalle_vacante.html?id=${id}`;
 }
 
-// 4. LÓGICA PARA CREAR NUEVA VACANTE (CON IA)
+// 4. CREAR VACANTE
 async function crearVacante() {
     const token = localStorage.getItem('token');
     const titleInput = document.getElementById('title');
@@ -114,7 +128,8 @@ async function crearVacante() {
         salary_range: document.getElementById('salary_range').value || null,
         experience_years: parseInt(document.getElementById('experience_years').value) || 0,
         location: document.getElementById('location').value || "Remoto",
-        priority: document.getElementById('priority').value || "medium"
+        priority: document.getElementById('priority').value || "medium",
+        max_candidatos: parseInt(document.getElementById('max_candidatos')?.value) || 1
     };
 
     mostrarStatusPro('cargando', 'IA analizando puesto...');
@@ -132,26 +147,25 @@ async function crearVacante() {
         if (response.ok) {
             mostrarStatusPro('exito', '¡Vacante Publicada!');
             setTimeout(() => {
-                // Cerrar modal usando Bootstrap
                 const modalElement = document.getElementById('modalNuevaVacante');
                 const modal = bootstrap.Modal.getInstance(modalElement);
                 if (modal) modal.hide();
                 
                 ocultarStatusPro();
                 document.getElementById('formVacante').reset();
-                obtenerVacantes(); // Refrescar lista
+                obtenerVacantes();
             }, 1200);
         } else {
             ocultarStatusPro();
-            alert("Error al crear la vacante. Intenta de nuevo.");
+            alert("Error al crear la vacante.");
         }
     } catch (error) { 
         ocultarStatusPro(); 
-        console.error("Error de red:", error);
+        console.error("Error:", error);
     }
 }
 
-// --- UTILIDADES VISUALES ---
+// UI
 function mostrarStatusPro(estado, mensaje) {
     const container = document.getElementById('status-container');
     const texto = document.getElementById('status-texto');
@@ -177,6 +191,7 @@ function ocultarStatusPro() {
     if (container) container.classList.add('d-none');
 }
 
+// BUSCADOR
 function filtrarVacantes() {
     const texto = document.getElementById('searchInput').value.toLowerCase();
     document.querySelectorAll('.job-card').forEach(tarjeta => {

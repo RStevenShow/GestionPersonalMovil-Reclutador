@@ -677,3 +677,49 @@ body {
 .entrevista-finalizada:active {
     transform: none !important;
 }
+
+/* =====================================================
+   13. ESTILOS DE RANKING Y SWITCHES
+===================================================== */
+/* Switch estilo iOS/Moderno */
+.custom-switch .form-check-input {
+    width: 3em;
+    height: 1.5em;
+    cursor: pointer;
+    background-color: #cbd5e1;
+    border-color: transparent;
+}
+
+.custom-switch .form-check-input:checked {
+    background-color: var(--color-secundario); /* El violeta de tu degradado */
+}
+
+/* Ranking Items */
+.talento-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.talento-item:last-child { border-bottom: none; }
+
+.posicion-top {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 12px;
+}
+
+.top-1 .posicion-top {
+    background: var(--color-gradiente);
+    color: white;
+}
+

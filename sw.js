@@ -43,30 +43,44 @@ self.addEventListener("push", function (event) {
    2. EVENTO: CLIC EN LA NOTIFICACIÓN
    Define qué pasa cuando el usuario toca la notificación
 ===================================================== */
+/*self.addEventListener("notificationclick", function (event) {
+  event.notification.close();
+
+  const urlToOpen = event.notification.data?.url || "/agenda.html";
+
+  event.waitUntil(
+    clients.openWindow(urlToOpen)
+  );
+});*/
+
+
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
 
   if (event.action === "close") return;
 
-  const urlToOpen = event.notification.data?.url || "/agenda.html";
+  const urlToOpen = new URL(
+    event.notification.data?.url || "/agenda.html",
+    self.location.origin
+  ).href;
 
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientsArr) => {
+
+      // Buscar si hay una pestaña abierta
       for (let client of clientsArr) {
-        if (client.url.includes(self.location.origin) && "focus" in client) {
-          client.focus();
-          client.navigate(urlToOpen);
-          return;
+        if ("focus" in client) {
+          return client.focus(); // 
         }
       }
 
+      //  Si no hay pestañas → abrir nueva
       if (clients.openWindow) {
         return clients.openWindow(urlToOpen);
       }
     })
   );
 });
-
 /* =====================================================
    3. EVENTO: INSTALACIÓN Y ACTIVACIÓN
    Ayuda a que el SW tome el control de la página de inmediato

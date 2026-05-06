@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inicio - MarkNica AI</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="app.css">
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+
+<body class="pantalla-menu">
+
+    <header class="encabezado-menu shadow-sm">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold">
+                    <img src="logo.png" alt="logo"class="logo-navbar-chico">
+                    <span id="nombreApp">MarkNic AI</span>
+                </h4>
+                <button onclick="cerrarSesion()" class="btn btn-sm btn-outline-light border-0">
+                    <i class="bi bi-box-arrow-right fs-4"></i>
+                </button>
+            </div>
+
+            <div class="row mt-4 text-center gap-2 px-2">
+                <div class="col p-0">
+                    <div class="estadistica">
+                        <span id="datoCandidatos">--</span>
+                        <br>
+                        <small>Candidatos</small>
+                    </div>
+                </div>
+                <div class="col p-0">
+                    <div class="estadistica">
+                        <span id="datoEntrevistas">--</span>
+                        <br>
+                        <small>Entrevistas</small>
+                    </div>
+                </div>
+                <div class="col p-0">
+                    <div class="estadistica">
+                        <span id="datoMatch">--%</span>
+                        <br>
+                        <small>Match IA</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mt-4 fade">
+        <h5 id="tituloAcciones" class="fw-bold mb-3 text-dark">Acciones inmediatas</h5>
+
+        <div id="contenedor-acciones">
+            <div id="accion1" class="tarjeta-accion prioridad-alta p-3 mb-3 d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm text-danger me-3" role="status"></div>
+                <span class="text-secondary fw-medium">Sincronizando con la nube...</span>
+            </div>
+            <div id="accion2" class="tarjeta-accion prioridad-media p-3 mb-3 d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm text-warning me-3" role="status"></div>
+                <span class="text-secondary fw-medium">Verificando vacantes...</span>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3 text-dark">Estado del proceso</h5>
+                <div style="position: relative; height: 250px;">
+                    <canvas id="graficoProceso"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-4 px-0">
+            <h5 class="fw-bold text-dark mb-3">Ranking por Vacante</h5>
+            <div id="contenedor-vacantes-ranking"></div>
+        </div>
+
+        <template id="temp-vacante">
+            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold mb-0 text-primary titulo-vacante">Nombre de la Vacante</h6>
+                        <small class="text-muted small">Top 3 candidatos</small>
+                    </div>
+                    <div class="form-check form-switch custom-switch">
+                        <input class="form-check-input" type="checkbox" role="switch">
+                        <label class="form-check-label small fw-bold text-muted">IA / Entrevista</label>
+                    </div>
+                </div>
+                <div class="card-body p-3 lista-talentos">
+                    </div>
+            </div>
+        </template>
+    </main>
+
+    <nav class="barra-inferior-pro">
+        <a href="menu.html" class="link-menu activo"><i class="bi bi-house"></i><span>Inicio</span></a>
+        <a href="vacantes.html" class="link-menu"><i class="bi bi-briefcase"></i><span>Vacantes</span></a>
+        <a href="agenda.html" class="link-menu"><i class="bi bi-calendar"></i><span>Agenda</span></a>
+        <a href="perfil.html" class="link-menu"><i class="bi bi-person"></i><span>Perfil</span></a>
+    </nav>
+
+    <script>
+const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
+const token = localStorage.getItem('token');
+let graficoReferencia = null;
+
+if (!token) {
+    window.location.href = "Login.html";
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    obtenerDatosDashboard();
+    cargarRankingVacantes();
+});
+
+// ===============================
+// 🔹 DASHBOARD STATS
+// ===============================
+async function obtenerDatosDashboard() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard-stats`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.status === 401) {
+            cerrarSesion();
+            return;
+        }
+
+        if (!response.ok) throw new Error("Error en servidor");
+
+        const data = await response.json();
+        console.log("DATA DASHBOARD:", data);
+
+        renderizarPantalla(data);
+
+    } catch (error) {
+        console.error("Error:", error);
+
+        document.getElementById("nombreApp").textContent = "Modo Offline";
+        document.getElementById("accion1").innerHTML =
+            `<i class="bi bi-wifi-off text-danger fs-5 me-3"></i> <span>Despertando servidor...</span>`;
+        document.getElementById("accion2").innerHTML =
+            `<i class="bi bi-arrow-clockwise text-primary fs-5 me-3"></i> <span>Reintentando conexión</span>`;
+    }
+}
+
+// ===============================
+// 🔹 RENDER UI
+// ===============================
+function renderizarPantalla(data) {
+    document.getElementById("nombreApp").textContent = data.appNombre || "MarkNica AI";
+    document.getElementById("datoCandidatos").textContent = data.candidatos || 0;
+    document.getElementById("datoEntrevistas").textContent =
+        data.proceso?.entrevistas || 0;
+    document.getElementById("datoMatch").textContent =
+        (data.match || 0) + "%";
+
+    const txtAccion1 = data.acciones?.[0] || "Todo al día";
+    const txtAccion2 = data.acciones?.[1] || "Sin novedades";
+
+    document.getElementById("accion1").innerHTML =
+        `<i class="bi bi-briefcase text-danger fs-5 me-3"></i><span>${txtAccion1}</span>`;
+
+    document.getElementById("accion2").innerHTML =
+        `<i class="bi bi-calendar-check text-warning fs-5 me-3"></i><span>${txtAccion2}</span>`;
+
+    dibujarGrafico(data.proceso || {});
+}
+
+// ===============================
+// 🔹 GRAFICO PIPELINE REAL
+// ===============================
+function dibujarGrafico(proceso) {
+    const canvas = document.getElementById("graficoProceso");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    if (graficoReferencia) graficoReferencia.destroy();
+
+    // 🔥 DATOS REALES DEL BACKEND
+    const screening = proceso.screening || 0;        // CVs sin entrevista
+    const entrevistas = proceso.entrevistas || 0;    // Entrevistas creadas
+    const evaluados = proceso.oferta || 0;           // Entrevistas completadas
+    const top = proceso.contratados || 0;            // Mejores candidatos
+
+    const total = screening + entrevistas + evaluados + top;
+
+    const datos = total === 0
+        ? [1]
+        : [screening, entrevistas, evaluados, top];
+
+    const etiquetas = total === 0
+        ? ["Sin datos"]
+        : [
+            "CV sin revisar",
+            "Entrevistas",
+            "Evaluados",
+            "Top candidatos"
+        ];
+
+    const colores = total === 0
+        ? ["#e2e8f0"]
+        : [
+            "#f59e0b", // amarillo
+            "#3b82f6", // azul
+            "#8b5cf6", // morado
+            "#10b981"  // verde
+        ];
+
+    graficoReferencia = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: etiquetas,
+            datasets: [{
+                data: datos,
+                backgroundColor: colores,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "75%",
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true,
+                        font: { size: 11 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ===============================
+// 🔹 RANKING VACANTES
+// ===============================
+async function cargarRankingVacantes() {
+    const contenedor = document.getElementById('contenedor-vacantes-ranking');
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard-vacantes-ranking`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        contenedor.innerHTML = '';
+
+        data.vacantes.forEach(vacante => {
+            const temp = document.getElementById('temp-vacante').content.cloneNode(true);
+            temp.querySelector('.titulo-vacante').innerText = vacante.titulo;
+
+            const switchInput = temp.querySelector('.form-check-input');
+            switchInput.setAttribute(
+                'onchange',
+                `renderizarListaTalentos('${vacante.id}', this.checked)`
+            );
+
+            window[`candidatos_${vacante.id}`] = vacante.candidatos;
+
+            const listaBody = temp.querySelector('.lista-talentos');
+            listaBody.id = `lista-${vacante.id}`;
+
+            contenedor.appendChild(temp);
+            renderizarListaTalentos(vacante.id, false);
+        });
+
+    } catch (error) {
+        console.error("Error cargando ranking:", error);
+    }
+}
+
+// ===============================
+// 🔹 LISTA TALENTOS
+// ===============================
+function renderizarListaTalentos(vacanteId, porEntrevista) {
+    const listaBody = document.getElementById(`lista-${vacanteId}`);
+    let candidatos = [...window[`candidatos_${vacanteId}`]];
+
+    if (porEntrevista) {
+        candidatos.sort((a, b) =>
+            (b.calificacion_entrevista || 0) - (a.calificacion_entrevista || 0)
+        );
+    } else {
+        candidatos.sort((a, b) => b.match_score - a.match_score);
+    }
+
+    listaBody.innerHTML = candidatos.slice(0, 3).map((c, index) => `
+        <div class="talento-item d-flex align-items-center py-2 border-bottom ${index === 0 ? 'top-1' : ''}">
+            <div class="posicion-top me-3 fw-bold ${index === 0 ? 'text-primary' : 'text-muted'}">#${index + 1}</div>
+            <div class="flex-grow-1">
+                <h6 class="mb-0 small fw-bold text-dark">${c.nombre}</h6>
+                <small class="text-muted">${c.email}</small>
+            </div>
+            <div class="text-end">
+                <span class="fw-bold ${porEntrevista ? 'text-success' : 'text-primary'}">
+                    ${porEntrevista 
+                        ? (c.calificacion_entrevista || '--') + ' pts'
+                        : Math.round(c.match_score) + '%'}
+                </span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===============================
+// 🔹 LOGOUT
+// ===============================
+function cerrarSesion() {
+    localStorage.removeItem('token');
+    window.location.href = "Login.html";
+}
+</script>
+</body>
+</html>

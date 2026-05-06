@@ -1,0 +1,810 @@
+/* =====================================================
+   APP HÍBRIDA - ESTILOS MAESTROS (PRODUCCIÓN)
+   Proyecto: MarkNica AI (Gestor de Talento Humano)
+   Autor: Ramon
+===================================================== */
+
+/* =====================================================
+   1. RESET Y VARIABLES GLOBALES
+===================================================== */
+:root {
+    --color-primario: #3b82f6;
+    --color-secundario: #8b5cf6;
+    --color-gradiente: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    --fondo-app: #f8fafc;
+    --texto-oscuro: #1e293b;
+    --texto-claro: #64748b;
+    --sombra-suave: 0 4px 15px rgba(0,0,0,0.04);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    min-height: 100dvh;
+    background: var(--fondo-app);
+    color: var(--texto-oscuro);
+    padding-bottom: 90px; /* Espacio para el menú inferior */
+    overflow-x: hidden;
+    touch-action: manipulation;
+}
+
+/* Clases Utilitarias */
+.d-none, .oculto { display: none !important; }
+
+/* =====================================================
+   2. PANTALLAS DE AUTENTICACIÓN (LOGIN/REGISTRO)
+===================================================== */
+.pantalla-auth {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--color-gradiente) fixed;
+    position: relative;
+}
+.logo-perfil {
+    width: 140px;           /* Subimos el tamaño para que se vea imponente */
+    height: auto;           /* Mantiene la proporción */
+    display: block;
+    margin: 0 auto 15px;    /* Centra y da espacio hacia el texto de abajo */
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); /* Le da un poco de relieve */
+}   
+.tarjeta-login,
+.tarjeta-registro,
+.tarjeta-blanca {
+    width: 100%;
+    max-width: 24rem;
+    background: white;
+    border-radius: 1.8rem;
+    overflow: hidden;
+    margin: auto;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    animation: fadeIn 0.4s ease;
+}
+
+.tarjeta-blanca { max-width: 28rem; padding: 2rem; }
+.tarjeta-registro { padding: 2rem; }
+
+.encabezado {
+    background: var(--color-gradiente);
+    color: white;
+    text-align: center;
+    padding: 2rem 1.2rem 1.5rem 1.2rem;
+}
+.encabezado h1 { font-size: 1.4rem; margin-top: 0.5rem; }
+.encabezado p { font-size: 0.8rem; opacity: 0.9; }
+
+/* =====================================================
+   3. ENCABEZADOS DE LA APP (GLASSMORPHISM UNIFICADO)
+===================================================== */
+.logo-navbar-chico {
+    width: 45px;           /* Tamaño ideal para la barra superior */
+    height: auto;          /* Proporción cuadrada */
+    object-fit: contain;   /* Evita que se deforme */
+    margin-right: 15px;    /* Espacio entre logo y texto */
+    
+    /* Este filtro es CLAVE: convierte tu logo a blanco para 
+       que resalte sobre el fondo azul del degradado */
+    filter: brightness(0) invert(1); 
+}
+
+/* Ajuste extra para asegurar alineación vertical */
+.encabezado-menu h4 {
+    display: flex !important;
+    align-items: center !important;
+    line-height: 1;
+}
+.encabezado-menu,
+.header-gradient,
+.agenda-header {
+    background: var(--color-gradiente);
+    color: white;
+    padding: 2rem 1.5rem 2.5rem 1.5rem;
+    border-bottom-left-radius: 2rem;
+    border-bottom-right-radius: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Forzar tamaño de números/datos principales */
+.stat-box-glass h3, 
+.estadistica span, 
+.agenda-box h2,
+.agenda-box h3 { 
+    font-size: 1.5rem !important; /* Tamaño grande y consistente */
+    font-weight: 700; 
+    margin-bottom: 0.1rem; 
+    display: block;
+    line-height: 1.2;
+}
+
+/* Forzar tamaño de etiquetas/subtítulos */
+.stat-box-glass span, 
+.estadistica small, 
+.agenda-box span,
+.agenda-box small { 
+    font-size: 0.85rem !important; /* Aumentado ligeramente para legibilidad */
+    opacity: 0.9; 
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.stat-box-glass, .estadistica, .agenda-box {
+    flex: 1;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 0.8rem 0.4rem;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* =====================================================
+   4. FORMULARIOS E INPUTS
+===================================================== */
+/* AJUSTE FINAL PARA QUE "CALIFICADO" NO SE CORTE */
+
+.agenda-info .d-flex {
+    display: flex !important;
+    flex-wrap: wrap !important; /* <--- Esto permite que si no cabe, baje */
+    gap: 6px !important;       /* Espacio entre los badges */
+}
+
+.badge {
+    max-width: none !important; /* Quitamos cualquier limite de ancho */
+    width: auto !important;
+    white-space: nowrap !important; /* Evita que la palabra se parta */
+    text-overflow: clip !important;
+}
+
+/* Si el teléfono es muy pequeño, le damos un poco más de aire al contenedor */
+@media (max-width: 380px) {
+    .agenda-card {
+        padding-right: 8px !important;
+    }
+    .agenda-info {
+        padding-right: 5px !important;
+    }
+}
+.formulario { padding: 1.5rem 1.3rem; }
+
+#form-login { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.grupo-input, .campo, .campo-app {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.2rem;
+}
+
+.grupo-input label, .campo label, .campo-app label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 0.4rem;
+}
+
+.grupo-input input,
+.campo input,
+.campo-app input,
+.campo-app textarea,
+.campo-app select {
+    width: 100%;
+    padding: 0.85rem;
+    border-radius: 0.7rem;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.grupo-input input:focus,
+.campo-app input:focus,
+.campo-app textarea:focus,
+.campo-app select:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    background: white;
+}
+
+.campo-app textarea { resize: none; }
+
+/* =====================================================
+   5. BOTONES Y ACCIONES
+===================================================== */
+.boton-login,
+.boton-registro,
+.boton-primario {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 1rem;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    background: var(--color-gradiente);
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.3);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s ease;
+}
+
+.boton-login:active,
+.boton-registro:active,
+.boton-primario:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
+}
+
+.enlaces-extra { text-align: center; margin-top: 1rem; }
+.enlaces-extra a { color: var(--color-primario); text-decoration: none; font-size: 0.8rem; }
+
+/* Botones Mini (Eliminar en perfil) */
+.btn-borrar-mini {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: none;
+    background: #fff1f2;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+.btn-borrar-mini:active { background: #ef4444; color: white; transform: scale(0.9); }
+
+/* =====================================================
+   6. BOTONES FLOTANTES (FAB)
+===================================================== */
+.agenda-fab,
+.btn-flotante-accion {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--color-gradiente);
+    color: white;
+    border: none;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    z-index: 1040;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+.agenda-fab:active, .btn-flotante-accion:active { transform: scale(0.9); }
+
+/* =====================================================
+   7. TARJETAS (VACANTES, AGENDA, RANKING)
+===================================================== */
+.logo-navbar-agenda {
+    width: 75%;           /* Tamaño del logo */
+    height: auto;
+    margin-right: 18px;    /* Espacio entre el logo y la palabra Vacantes */
+    filter: brightness(0) invert(1); /* Lo pone en blanco */
+    object-fit: contain;
+}
+
+/* Forzamos la alineación vertical perfecta */
+h2.d-inline-flex {
+    display: inline-flex !important;
+    align-items: center !important;
+    vertical-align: middle;
+}
+.logo-navbar-vacantes {
+    width: 40px;           /* Ajustamos un poco el tamaño para que no sea gigante */
+    height: auto;
+    margin-right: 12px;    /* Espacio para que no se pegue a la letra A */
+    filter: brightness(0) invert(1); /* Lo mantiene blanco */
+    object-fit: contain;
+}
+
+/* Forzamos a que el título h1 alinee el contenido al centro vertical */
+h1.d-flex {
+    display: flex !important;
+    align-items: center !important;
+}
+.card,
+.agenda-card,
+.job-card,
+.tarjeta-accion,
+.mini-card-vacante {
+    background: white;
+    border-radius: 1.2rem;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--sombra-suave);
+    border: none;
+    transition: transform 0.2s ease, background-color 0.2s;
+    cursor: pointer;
+}
+
+.card:active,
+.agenda-card:active,
+.job-card:active,
+.tarjeta-accion:active {
+    transform: scale(0.97);
+    background: #f1f5f9;
+}
+
+/* Indicadores de Prioridad (Borde izquierdo) */
+.prioridad-high, .prioridad-alta { border-left: 5px solid #ef4444 !important; }
+.prioridad-medium, .prioridad-media { border-left: 5px solid #f59e0b !important; }
+.prioridad-low, .prioridad-baja { border-left: 5px solid #10b981 !important; }
+
+/* TABS (Agenda) */
+.agenda-tabs {
+    display: flex;
+    background: #e5e7eb;
+    border-radius: 999px;
+    padding: 0.3rem;
+    margin-bottom: 1.5rem;
+}
+.tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.6rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--texto-claro);
+    transition: all 0.3s ease;
+}
+.tab-btn.active {
+    background: var(--color-gradiente) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* =====================================================
+   8. MENÚ INFERIOR (BOTTOM NAVBAR)
+===================================================== */
+.barra-inferior-pro {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 75px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.link-menu {
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
+    color: var(--texto-claro);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    transition: 0.2s;
+}
+
+.link-menu i { font-size: 22px; }
+.link-menu span { font-size: 10px; }
+.link-menu.activo { color: var(--color-primario); font-weight: 600; }
+.link-menu.activo i { transform: translateY(-2px); }
+.link-menu:active { transform: scale(0.95); }
+
+/* =====================================================
+   9. MODALES, OVERLAYS Y STATUS PRO
+===================================================== */
+/* Backdrop y capa base */
+.modal-backdrop, .sheet-overlay {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(4px);
+    z-index: 1050 !important;
+}
+
+.modal { z-index: 1060 !important; }
+
+/* Contenedor del Modal (Redondeado estilo App) */
+.modal-content-app {
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+    background: white;
+    border: none;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding-bottom: 2rem;
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+}
+
+.sheet-handle {
+    width: 40px;
+    height: 5px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    margin: 0.5rem auto 1rem auto;
+}
+
+/* Status Loader Centrado (Cuando creas vacantes) */
+#status-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    transition: all 0.3s ease;
+}
+
+.status-box {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 1.5rem;
+    text-align: center;
+    width: 260px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    animation: aparecerStatus 0.4s ease-out forwards;
+}
+
+/* Scrollbar personalizada para modales largos */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+/* =====================================================
+   10. ANIMACIONES
+===================================================== */
+.fade { animation: fadeIn 0.4s ease-out forwards; opacity: 1; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes aparecerStatus {
+    from { opacity: 0; transform: translateY(20px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* =====================================================
+   11. RESPONSIVE Y FIXES MÓVILES
+===================================================== */
+@media (max-width: 576px) {
+    .modal-dialog-bottom {
+        margin: 0;
+        display: flex;
+        align-items: flex-end;
+        min-height: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .header-gradient, .encabezado-menu { padding: 1.5rem 1rem 2.5rem 1rem; }
+    .stat-box-glass h3 { font-size: 1.2rem; }
+    .tarjeta-login { border-radius: 1.4rem; padding: 1.5rem; }
+    .encabezado h1 { font-size: 1.2rem; }
+}
+
+.footer-app {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: white; /* Para que resalte sobre el fondo azul/morado */
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+/* =====================================================
+   12. MODALES ESPECÍFICOS DEL PERFIL (BOTTOM SHEET Y ALERTAS)
+===================================================== */
+.encabezado-menu {
+    padding-top: 40px !important; /* Bajamos un poco todo para que el logo respire arriba */
+    min-height: 220px;
+    background: linear-gradient(135px, #4f46e5 0%, #a855f7 100%);
+}
+
+/* Efecto para que la imagen por defecto se vea limpia */
+#img-perfil {
+    background-color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+/* Contenedores de alerta flotantes a pantalla completa */
+#confirm-container, 
+#confirm-baja-container {
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 6000; /* Siempre por encima de todo */
+}
+
+/* Capa oscura detrás del menú corredizo */
+.sheet-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 5000;
+}
+
+/* La ventana corrediza (Bottom Sheet) */
+.bottom-sheet {
+    position: fixed;
+    bottom: -120%; /* Empieza escondida completamente abajo */
+    left: 0;
+    width: 100%;
+    background: white;
+    border-radius: 2rem 2rem 0 0;
+    z-index: 5001;
+    transition: bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.15);
+}
+
+/* Clase mágica que el JavaScript activa para subir la ventana */
+.bottom-sheet.active {
+    bottom: 0;
+}
+
+/* Encabezado del Bottom Sheet */
+.sheet-header {
+    text-align: center;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 10px;
+    padding-top: 5px;
+}
+
+/* =====================================================
+   ESTILO DE MINI TARJETAS DE VACANTES (PERFIL)
+===================================================== */
+.mini-card-vacante {
+    display: flex;
+    justify-content: space-between; /* Empuja el texto a la izquierda y el icono a la derecha */
+    align-items: center;
+    background: white;
+    padding: 1rem 1.2rem;
+    border-radius: 1rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    /* Borde rojo suave para indicar que son elementos eliminables */
+    border: 1.5px solid rgba(220, 38, 38, 0.2); 
+    transition: all 0.2s ease;
+}
+
+.mini-card-vacante:active {
+    transform: scale(0.98);
+    background: #fff5f5; /* Un tono rojizo muy leve al tocar */
+    border-color: rgba(220, 38, 38, 0.5);
+}
+
+.btn-borrar-mini {
+    background: #fee2e2; /* Fondo rojo muy claro para el botón */
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #dc2626; /* Color del icono de basura (Rojo fuerte) */
+    transition: all 0.2s ease;
+}
+
+.btn-borrar-mini i {
+    font-size: 1.2rem;
+}
+
+
+/* --- ESTILOS DE LA SALA DE VIDEO --- */
+
+.body-sala {
+    background-color: #0f172a;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+.video-container {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
+}
+
+/* Video Remoto */
+#remoteVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Video Local (Miniatura) */
+#localVideo {
+    position: absolute;
+    top: env(safe-area-inset-top, 20px);
+    right: 20px;
+    width: 110px;
+    height: 160px;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    object-fit: cover;
+    z-index: 10;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    background: #000;
+    transform: scaleX(-1); /* Efecto espejo */
+}
+
+/* Controles */
+.controls-bar {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 20;
+    padding: 12px 20px;
+    border-radius: 50px;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-action {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+}
+
+.btn-action:active {
+    transform: scale(0.85);
+}
+
+.btn-hangup {
+    background: #ef4444 !important;
+}
+
+.btn-off {
+    background: #64748b !important;
+    color: #cbd5e1;
+}
+
+/* Modal y Score */
+.score-display {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #3b82f6;
+    margin-bottom: 10px;
+}
+
+.custom-range::-webkit-slider-thumb {
+    background: #3b82f6;
+}
+
+.modal-content {
+    border-radius: 24px !important;
+}
+
+/* Estilo para tarjetas ya calificadas/completadas */
+.entrevista-finalizada {
+    background-color: #f1f5f9 !important; /* Gris muy claro */
+    opacity: 0.75;
+    filter: grayscale(0.5);
+    position: relative;
+    pointer-events: none; /* Desactiva clics */
+}
+
+.entrevista-finalizada::after {
+    content: "✓ Finalizada";
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 0.65rem;
+    font-weight: bold;
+    color: #10b981;
+    text-transform: uppercase;
+}
+
+/* Evitar que el efecto hover funcione en tarjetas bloqueadas */
+.entrevista-finalizada:active {
+    transform: none !important;
+}
+
+/* =====================================================
+   13. ESTILOS DE RANKING Y SWITCHES
+===================================================== */
+/* Switch estilo iOS/Moderno */
+.custom-switch .form-check-input {
+    width: 3em;
+    height: 1.5em;
+    cursor: pointer;
+    background-color: #cbd5e1;
+    border-color: transparent;
+}
+
+.custom-switch .form-check-input:checked {
+    background-color: var(--color-secundario); /* El violeta de tu degradado */
+}
+
+/* Ranking Items */
+.talento-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.talento-item:last-child { border-bottom: none; }
+
+.posicion-top {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 12px;
+}
+
+.top-1 .posicion-top {
+    background: var(--color-gradiente);
+    color: white;
+}
+

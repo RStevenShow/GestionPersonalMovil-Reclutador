@@ -48,33 +48,109 @@ const formRegistro = document.getElementById('form-registro');
 
 // --- 1. GESTIÓN DE LOGIN ---
 if (formLogin) {
-    formLogin.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        actualizarStatus('cargando', 'Verificando credenciales...');
 
-        // FastAPI OAuth2 usa FormData por defecto
-        const formData = new FormData();
-        formData.append('username', document.getElementById('login-email').value);
-        formData.append('password', document.getElementById('login-password').value);
+    formLogin.addEventListener('submit', async (e) => {
+
+        e.preventDefault();
+
+        actualizarStatus(
+            'cargando',
+            'Verificando credenciales...'
+        );
+
+        const email =
+            document.getElementById('login-email').value;
+
+        const password =
+            document.getElementById('login-password').value;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: 'POST',
-                body: formData
-            });
 
-            if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('token', data.access_token);
-                actualizarStatus('exito', '¡Bienvenido de nuevo!');
-                setTimeout(() => { window.location.href = "menu.html"; }, 1200);
-            } else {
+            // ===================================
+            // LOGIN SUPABASE
+            // ===================================
+
+            const { data, error } =
+                await supabaseClient.auth.signInWithPassword({
+
+                    email: email,
+                    password: password
+
+                });
+
+            // ===================================
+            // ERROR LOGIN
+            // ===================================
+
+            if (error) {
+
                 ocultarStatus();
-                mostrarError("Correo o contraseña incorrectos.");
+
+                mostrarError(error.message);
+
+                return;
             }
+
+            // ===================================
+            // VALIDAR EMAIL CONFIRMADO
+            // ===================================
+
+            if (!data.user.email_confirmed_at) {
+
+                ocultarStatus();
+
+                mostrarError(
+                    "Debes confirmar tu correo electrónico."
+                );
+
+                return;
+            }
+
+            // ===================================
+            // GUARDAR TOKEN
+            // ===================================
+
+            localStorage.setItem(
+
+                'token',
+
+                data.session.access_token
+            );
+
+            // ===================================
+            // GUARDAR USER
+            // ===================================
+
+            localStorage.setItem(
+
+                'user',
+
+                JSON.stringify(data.user)
+            );
+
+            // ===================================
+            // ÉXITO
+            // ===================================
+
+            actualizarStatus(
+                'exito',
+                '¡Bienvenido nuevamente!'
+            );
+
+            setTimeout(() => {
+
+                window.location.href =
+                    "menu.html";
+
+            }, 1500);
+
         } catch (err) {
+
             ocultarStatus();
-            mostrarError("Error al conectar. El servidor podría estar iniciando.");
+
+            mostrarError(
+                "Error conectando con Supabase."
+            );
         }
     });
 }

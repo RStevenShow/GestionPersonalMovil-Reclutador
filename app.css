@@ -808,3 +808,133 @@ h1.d-flex {
     color: white;
 }
 
+/* =====================================================
+   14. RESET PASSWORD / RECUPERAR CONTRASEÑA
+===================================================== */
+
+/* Caja principal del reset */
+.tarjeta-reset {
+    width: 100%;
+    max-width: 28rem;
+    background: white;
+    border-radius: 1.8rem;
+    overflow: hidden;
+    margin: auto;
+    padding: 2rem;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    animation: fadeIn 0.4s ease;
+}
+
+/* Icono principal */
+.icono-reset {
+    width: 85px;
+    height: 85px;
+    margin: 0 auto 1rem auto;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icono-reset i {
+    font-size: 2.3rem;
+    color: var(--color-primario);
+}
+
+/* Titulos */
+.titulo-reset {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--texto-oscuro);
+    margin-bottom: 0.5rem;
+}
+
+.texto-reset {
+    font-size: 0.9rem;
+    color: var(--texto-claro);
+    line-height: 1.5;
+    margin-bottom: 1.8rem;
+}
+
+/* Inputs del reset */
+.form-reset {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.form-reset input {
+    width: 100%;
+    padding: 0.95rem;
+    border-radius: 1rem;
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+    outline: none;
+}
+
+.form-reset input:focus {
+    border-color: var(--color-primario);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+/* Botón */
+.btn-reset {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 1rem;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    background: var(--color-gradiente);
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.3);
+    transition: all 0.25s ease;
+}
+
+.btn-reset:active {
+    transform: scale(0.98);
+}
+
+/* Link volver */
+.link-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 1.5rem;
+    text-decoration: none;
+    color: var(--color-primario);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.link-volver:hover {
+    opacity: 0.9;
+}
+
+/* Alertas visuales */
+.alert-reset {
+    border-radius: 1rem;
+    font-size: 0.9rem;
+    padding: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .tarjeta-reset {
+        padding: 1.6rem;
+        border-radius: 1.5rem;
+    }
+
+    .titulo-reset {
+        font-size: 1.3rem;
+    }
+
+    .texto-reset {
+        font-size: 0.85rem;
+    }
+}

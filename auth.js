@@ -240,6 +240,91 @@ if (formRegistro) {
     });
 }
 
+
+// =====================================================
+// RECUPERAR CONTRASEÑA
+// =====================================================
+
+const formOlvidar =
+    document.getElementById('form-olvidar');
+
+if (formOlvidar) {
+
+    formOlvidar.addEventListener(
+        'submit',
+
+        async (e) => {
+
+            e.preventDefault();
+
+            actualizarStatus(
+                'cargando',
+                'Enviando correo de recuperación...'
+            );
+
+            // ===================================
+            // EMAIL
+            // ===================================
+
+            const email =
+                document.getElementById(
+                    'recovery-email'
+                ).value;
+
+            try {
+
+                // ===================================
+                // SUPABASE RESET PASSWORD
+                // ===================================
+
+                const { error } =
+                    await supabaseClient.auth
+                    .resetPasswordForEmail(
+
+                        email,
+
+                        {
+                            redirectTo:
+                            "https://gestion-personal-movil-reclutador.vercel.app/reset-password.html"
+                        }
+                    );
+
+                // ===================================
+                // ERROR
+                // ===================================
+
+                if (error) {
+
+                    ocultarStatus();
+
+                    mostrarError(
+                        error.message
+                    );
+
+                    return;
+                }
+
+                // ===================================
+                // ÉXITO
+                // ===================================
+
+                actualizarStatus(
+                    'exito',
+                    'Correo de recuperación enviado.'
+                );
+
+            } catch (err) {
+
+                ocultarStatus();
+
+                mostrarError(
+                    'Error enviando recuperación.'
+                );
+            }
+        }
+    );
+}
+
 // --- 3. UTILIDADES DE INTERFAZ (UI) ---
 
 function actualizarStatus(estado, mensaje) {

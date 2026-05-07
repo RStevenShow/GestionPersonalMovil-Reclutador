@@ -1,15 +1,39 @@
 {
   "name": "MarkNica Recruiting AI",
   "short_name": "MarkNica",
-  "description": "Gestión de talento humano con inteligencia artificial.",
+  "description": "Plataforma avanzada de gestión de talento humano y reclutamiento impulsada por inteligencia artificial.",
   "lang": "es",
-  "start_url": "Login.html",
+  "dir": "ltr",
+  "start_url": "/Login.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f8fafc",
-  "theme_color": "#2563eb",
+  "theme_color": "#3b82f6",
+  "categories": ["business", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Ver Agenda",
+      "short_name": "Agenda",
+      "url": "/agenda.html",
+      "description": "Ver entrevistas programadas para hoy",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mis Vacantes",
+      "short_name": "Vacantes",
+      "url": "/vacantes.html",
+      "description": "Gestionar ofertas de empleo activas",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
   "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
@@ -21,6 +45,15 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "label": "Vista principal del Dashboard de Reclutamiento",
+      "form_factor": "narrow"
     }
   ]
 }

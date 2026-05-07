@@ -10,11 +10,12 @@ const SUPABASE_ANON_KEY =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ycmV0bmFnaHZraXB3Z2drdGZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMTA0NDgsImV4cCI6MjA5MTc4NjQ0OH0.UF_bhFFP__31GiiTxy2fsaKVqNjGie6H2LdGuAvZmoc";
 
 const supabaseClient = supabase.createClient(
+    console.log("Supabase conectado correctamente"),
     SUPABASE_URL,
     SUPABASE_ANON_KEY
 );
 
-console.log("Supabase conectado correctamente");
+
 const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
 
 

@@ -297,6 +297,43 @@ if (formResetPassword) {
     });
 }
 
+// --- GESTIÓN DE OLVIDAR CONTRASEÑA (Enviar correo) ---
+const formOlvidar = document.getElementById('form-olvidar');
+
+if (formOlvidar) {
+    formOlvidar.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('recovery-email').value;
+
+        actualizarStatus('cargando', 'Enviando enlace de recuperación...');
+
+        try {
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                // Esta es la URL a la que el usuario llegará al hacer clic en su correo
+                redirectTo: 'https://gestion-personal-movil-reclutador.vercel.app/reset-password.html',
+            });
+
+            if (error) {
+                ocultarStatus();
+                mostrarError(error.message);
+                return;
+            }
+
+            actualizarStatus('exito', 'Enlace enviado. Revisa tu bandeja de entrada.');
+
+            // Opcional: Redirigir al login después de un momento
+            setTimeout(() => {
+                window.location.href = "Login.html";
+            }, 3500);
+
+        } catch (err) {
+            ocultarStatus();
+            mostrarError("Error al conectar con el servicio de recuperación.");
+        }
+    });
+}
+
 // --- 3. UTILIDADES DE INTERFAZ (UI) ---
 
 function actualizarStatus(estado, mensaje) {

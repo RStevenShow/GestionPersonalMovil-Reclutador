@@ -81,55 +81,85 @@ if (formLogin) {
 
 // --- 2. GESTIÓN DE REGISTRO ---
 if (formRegistro) {
+
     formRegistro.addEventListener('submit', async (e) => {
+
         e.preventDefault();
-        
-        // Iniciamos el proceso mostrando el modal de carga
-        actualizarStatus('cargando', 'Creando tu perfil en MarkNica...');
 
-        // Capturamos los datos del formulario
-        const nombre = document.getElementById('reg-nombre').value;
-        const email = document.getElementById('reg-email').value;
-        const password = document.getElementById('reg-password').value;
+        actualizarStatus(
+            'cargando',
+            'Creando tu cuenta...'
+        );
 
-        // Construimos el objeto exacto que pide tu SQLModel (UserCreate)
-        const nuevoUsuario = {
-            username: email,    // Obligatorio en tu modelo
-            email: email,       // Obligatorio
-            full_name: nombre,  // Opcional/Heredado
-            password: password, // Obligatorio en UserCreate
-            role: "reclutador"  // Valor por defecto
-        };
+        const nombre =
+            document.getElementById('reg-nombre').value;
+
+        const email =
+            document.getElementById('reg-email').value;
+
+        const password =
+            document.getElementById('reg-password').value;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(nuevoUsuario)
-            });
 
-            if (response.ok) {
-                // CAMBIO SOLICITADO: El mismo modal cambia el mensaje y muestra el éxito
-                actualizarStatus('exito', '¡Cuenta creada correctamente!');
-                
-                // Esperamos un momento para que el usuario vea el mensaje de éxito antes de redirigir
-                setTimeout(() => { 
-                    window.location.href = "Login.html"; 
-                }, 2500);
-            } else {
-                const errorData = await response.json();
+            // ===================================
+            // REGISTRO EN SUPABASE AUTH
+            // ===================================
+
+            const { data, error } =
+                await supabaseClient.auth.signUp({
+
+                    email: email,
+
+                    password: password,
+
+                    options: {
+
+                        data: {
+                            full_name: nombre
+                        },
+
+                        emailRedirectTo:
+                            "https://gestion-personal-movil-reclutador.vercel.app/Login.html"
+                    }
+                });
+
+            // ===================================
+            // ERROR
+            // ===================================
+
+            if (error) {
+
                 ocultarStatus();
-                // Manejamos el error 422 o correos duplicados
-                const mensaje = errorData.detail && typeof errorData.detail === 'string' 
-                                ? errorData.detail 
-                                : "Error en el registro. Verifica los datos.";
-                mostrarError(mensaje);
+
+                mostrarError(error.message);
+
+                return;
             }
+
+            // ===================================
+            // ÉXITO
+            // ===================================
+
+            actualizarStatus(
+                'exito',
+                'Cuenta creada. Revisa tu correo electrónico.'
+            );
+
+            setTimeout(() => {
+
+                window.location.href =
+                    "Login.html";
+
+            }, 3000);
+
         } catch (err) {
+
             ocultarStatus();
-            mostrarError("Fallo de conexión. Reintenta en unos segundos.");
+
+            mostrarError(
+                "Error conectando con Supabase."
+            );
         }
     });
 }

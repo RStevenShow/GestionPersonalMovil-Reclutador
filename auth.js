@@ -245,84 +245,56 @@ if (formRegistro) {
 // RECUPERAR CONTRASEÑA
 // =====================================================
 
-const formOlvidar =
-    document.getElementById('form-olvidar');
+const formResetPassword = document.getElementById("form-reset-password");
 
-if (formOlvidar) {
+if (formResetPassword) {
 
-    formOlvidar.addEventListener(
-        'submit',
+    formResetPassword.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-        async (e) => {
+        actualizarStatus("cargando", "Actualizando contraseña...");
 
-            e.preventDefault();
+        const nuevaPassword =
+            document.getElementById("reset-password").value;
+
+        try {
+
+            const { error } =
+                await supabaseClient.auth.updateUser({
+                    password: nuevaPassword
+                });
+
+            if (error) {
+                ocultarStatus();
+                mostrarError(error.message);
+                return;
+            }
 
             actualizarStatus(
-                'cargando',
-                'Enviando correo de recuperación...'
+                "exito",
+                "Contraseña actualizada correctamente"
             );
 
-            // ===================================
-            // EMAIL
-            // ===================================
+            // REDIRECCIÓN AUTOMÁTICA
+            setTimeout(() => {
 
-            const email =
-                document.getElementById(
-                    'recovery-email'
-                ).value;
+                // cerrar sesión previa
+                supabaseClient.auth.signOut();
 
-            try {
+                // Volver al login
+                window.location.href = "Login.html";
 
-                // ===================================
-                // SUPABASE RESET PASSWORD
-                // ===================================
+            }, 2200);
 
-                const { error } =
-                    await supabaseClient.auth
-                    .resetPasswordForEmail(
+        } catch (err) {
 
-                        email,
+            ocultarStatus();
 
-                        {
-                            redirectTo:
-                            "https://gestion-personal-movil-reclutador.vercel.app/reset-password.html"
-                        }
-                    );
-
-                // ===================================
-                // ERROR
-                // ===================================
-
-                if (error) {
-
-                    ocultarStatus();
-
-                    mostrarError(
-                        error.message
-                    );
-
-                    return;
-                }
-
-                // ===================================
-                // ÉXITO
-                // ===================================
-
-                actualizarStatus(
-                    'exito',
-                    'Correo de recuperación enviado.'
-                );
-
-            } catch (err) {
-
-                ocultarStatus();
-
-                mostrarError(
-                    'Error enviando recuperación.'
-                );
-            }
+            mostrarError(
+                "No se pudo actualizar la contraseña"
+            );
         }
-    );
+    });
 }
 
 // --- 3. UTILIDADES DE INTERFAZ (UI) ---

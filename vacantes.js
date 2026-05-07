@@ -122,9 +122,13 @@ async function crearVacante() {
         return;
     }
 
+    // Estructuramos los datos, capturando las skills para la IA de forma segura
     const datosVacante = {
         title: titleInput.value,
         description_original: descInput.value,
+        // --- NUEVO CAMPO INTEGRADO ---
+        skills_clave: document.getElementById('skills_clave') ? document.getElementById('skills_clave').value : "",
+        // -----------------------------
         salary_range: document.getElementById('salary_range').value || null,
         experience_years: parseInt(document.getElementById('experience_years').value) || 0,
         location: document.getElementById('location').value || "Remoto",
@@ -157,11 +161,11 @@ async function crearVacante() {
             }, 1200);
         } else {
             ocultarStatusPro();
-            alert("Error al crear la vacante.");
+            alert("Error al crear la vacante. Revisa la consola.");
         }
     } catch (error) { 
         ocultarStatusPro(); 
-        console.error("Error:", error);
+        console.error("Error en la petición:", error);
     }
 }
 

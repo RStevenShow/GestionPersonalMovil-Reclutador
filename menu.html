@@ -3,20 +3,16 @@
 
 <head>
     <meta charset="UTF-8">
-    <!-- Accesibilidad: Permitimos el zoom para mejorar el puntaje y ayudar a usuarios con problemas visuales -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - MarkNica AI</title>
-    <!-- SEO: Añadido para subir el puntaje de 91 a 100 -->
     <meta name="description" content="Panel de gestión de reclutamiento inteligente de MarkNica AI.">
 
-    <!-- Rendimiento: Preconexión para reducir el tiempo de carga de recursos externos -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     
-    <!-- CSS de Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" media="print" onload="this.media='all'">
     
-    <!-- Rendimiento: Chart.js con 'defer' para que no bloquee el dibujo de la página -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     
     <link rel="stylesheet" href="app.css">
@@ -33,45 +29,24 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="mb-0 fw-bold d-flex align-items-center">
-                    <!-- Rendimiento: Dimensiones explícitas para evitar saltos (CLS) -->
                     <img src="logo.png" alt="MarkNica Logo" width="45" height="45" class="logo-navbar-chico me-2">
                     <span id="nombreApp">MarkNic AI</span>
                 </h4>
-                <!-- Accesibilidad: Se añadió aria-label para que los lectores de pantalla entiendan el botón -->
                 <button onclick="cerrarSesion()" class="btn btn-sm btn-outline-light border-0" aria-label="Cerrar sesión">
                     <i class="bi bi-box-arrow-right fs-4"></i>
                 </button>
             </div>
 
             <div class="row mt-4 text-center gap-2 px-2">
-                <div class="col p-0">
-                    <div class="estadistica">
-                        <span id="datoCandidatos">--</span>
-                        <br>
-                        <small>Candidatos</small>
-                    </div>
-                </div>
-                <div class="col p-0">
-                    <div class="estadistica">
-                        <span id="datoEntrevistas">--</span>
-                        <br>
-                        <small>Entrevistas</small>
-                    </div>
-                </div>
-                <div class="col p-0">
-                    <div class="estadistica">
-                        <span id="datoMatch">--%</span>
-                        <br>
-                        <small>Match IA</small>
-                    </div>
-                </div>
+                <div class="col p-0"><div class="estadistica"><span id="datoCandidatos">--</span><br><small>Candidatos</small></div></div>
+                <div class="col p-0"><div class="estadistica"><span id="datoEntrevistas">--</span><br><small>Entrevistas</small></div></div>
+                <div class="col p-0"><div class="estadistica"><span id="datoMatch">--%</span><br><small>Match IA</small></div></div>
             </div>
         </div>
     </header>
 
     <main class="container mt-4 fade">
         <h5 id="tituloAcciones" class="fw-bold mb-3 text-dark">Acciones inmediatas</h5>
-
         <div id="contenedor-actions">
             <div id="accion1" class="tarjeta-accion prioridad-alta p-3 mb-3 d-flex align-items-center">
                 <div class="spinner-border spinner-border-sm text-danger me-3" role="status"></div>
@@ -126,19 +101,17 @@
         const token = localStorage.getItem('token');
         let graficoReferencia = null;
 
-        if (!token) {
-            window.location.href = "Login.html";
-        }
+        if (!token) { window.location.href = "Login.html"; }
 
-        // Rendimiento: Fragmentamos la carga para reducir el Total Blocking Time (TBT)
+        // ESTRATEGIA DE CARGA ESCALONADA PARA BAJAR TBT
         document.addEventListener('DOMContentLoaded', () => {
-            // Prioridad 1: Datos de arriba (Dashboard)
+            // 1. Obtener datos numéricos (rápido)
             obtenerDatosDashboard();
 
-            // Prioridad 2: Ranking (esperamos un poco para no saturar el hilo principal)
+            // 2. Cargar ranking después de un delay para liberar el hilo principal (TBT)
             setTimeout(() => {
                 cargarRankingVacantes();
-            }, 800);
+            }, 1000); 
         });
 
         async function obtenerDatosDashboard() {
@@ -146,21 +119,14 @@
                 const response = await fetch(`${API_BASE_URL}/api/dashboard-stats`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-
-                if (response.status === 401) {
-                    cerrarSesion();
-                    return;
-                }
-
+                if (response.status === 401) { cerrarSesion(); return; }
                 if (!response.ok) throw new Error("Error en servidor");
                 const data = await response.json();
                 renderizarPantalla(data);
-
             } catch (error) {
                 console.error("Error:", error);
                 document.getElementById("nombreApp").textContent = "Modo Offline";
-                document.getElementById("accion1").innerHTML = `<i class="bi bi-wifi-off text-danger fs-5 me-3"></i> <span>Despertando servidor...</span>`;
-                document.getElementById("accion2").innerHTML = `<i class="bi bi-arrow-clockwise text-primary fs-5 me-3"></i> <span>Reintentando conexión</span>`;
+                document.getElementById("accion1").innerHTML = `<i class="bi bi-wifi-off text-danger fs-5 me-3"></i> <span>Reintentando conexión</span>`;
             }
         }
 
@@ -169,45 +135,34 @@
             document.getElementById("datoCandidatos").textContent = data.candidatos || 0;
             document.getElementById("datoEntrevistas").textContent = data.proceso?.entrevistas || 0;
             document.getElementById("datoMatch").textContent = (data.match || 0) + "%";
-
-            const txtAccion1 = data.acciones?.[0] || "Todo al día";
-            const txtAccion2 = data.acciones?.[1] || "Sin novedades";
-
-            document.getElementById("accion1").innerHTML = `<i class="bi bi-briefcase text-danger fs-5 me-3"></i><span>${txtAccion1}</span>`;
-            document.getElementById("accion2").innerHTML = `<i class="bi bi-calendar-check text-warning fs-5 me-3"></i><span>${txtAccion2}</span>`;
-
-            dibujarGrafico(data.proceso || {});
+            document.getElementById("accion1").innerHTML = `<i class="bi bi-briefcase text-danger fs-5 me-3"></i><span>${data.acciones?.[0] || "Todo al día"}</span>`;
+            document.getElementById("accion2").innerHTML = `<i class="bi bi-calendar-check text-warning fs-5 me-3"></i><span>${data.acciones?.[1] || "Sin novedades"}</span>`;
+            
+            // Retrasar el dibujo del gráfico 200ms para evitar lag en el scroll inicial
+            setTimeout(() => dibujarGrafico(data.proceso || {}), 200);
         }
 
         function dibujarGrafico(proceso) {
             const canvas = document.getElementById("graficoProceso");
-            if (!canvas) return;
+            if (!canvas || !window.Chart) return; 
             const ctx = canvas.getContext('2d');
             if (graficoReferencia) graficoReferencia.destroy();
-
-            const screening = proceso.screening || 0;
-            const entrevistas = proceso.entrevistas || 0;
-            const evaluados = proceso.oferta || 0;
-            const top = proceso.contratados || 0;
-            const total = screening + entrevistas + evaluados + top;
-
-            const datos = total === 0 ? [1] : [screening, entrevistas, evaluados, top];
-            const etiquetas = total === 0 ? ["Sin datos"] : ["CV sin revisar", "Entrevistas", "Evaluados", "Top candidatos"];
-            const colores = total === 0 ? ["#e2e8f0"] : ["#f59e0b", "#3b82f6", "#8b5cf6", "#10b981"];
 
             graficoReferencia = new Chart(ctx, {
                 type: "doughnut",
                 data: {
-                    labels: etiquetas,
-                    datasets: [{ data: datos, backgroundColor: colores, borderWidth: 0 }]
+                    labels: ["CV sin revisar", "Entrevistas", "Evaluados", "Top candidatos"],
+                    datasets: [{
+                        data: [proceso.screening || 0, proceso.entrevistas || 0, proceso.oferta || 0, proceso.contratados || 0],
+                        backgroundColor: ["#f59e0b", "#3b82f6", "#8b5cf6", "#10b981"],
+                        borderWidth: 0
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     cutout: "75%",
-                    plugins: {
-                        legend: { position: "bottom", labels: { padding: 15, usePointStyle: true, font: { size: 11 } } }
-                    }
+                    plugins: { legend: { position: "bottom", labels: { padding: 15, usePointStyle: true, font: { size: 11 } } } }
                 }
             });
         }
@@ -226,49 +181,27 @@
                     temp.querySelector('.titulo-vacante').innerText = vacante.titulo;
                     const switchInput = temp.querySelector('.form-check-input');
                     switchInput.setAttribute('onchange', `renderizarListaTalentos('${vacante.id}', this.checked)`);
-                    
                     window[`candidatos_${vacante.id}`] = vacante.candidatos;
-                    const listaBody = temp.querySelector('.lista-talentos');
-                    listaBody.id = `lista-${vacante.id}`;
-
+                    temp.querySelector('.lista-talentos').id = `lista-${vacante.id}`;
                     contenedor.appendChild(temp);
                     renderizarListaTalentos(vacante.id, false);
                 });
-            } catch (error) {
-                console.error("Error cargando ranking:", error);
-            }
+            } catch (error) { console.error("Error ranking:", error); }
         }
 
         function renderizarListaTalentos(vacanteId, porEntrevista) {
             const listaBody = document.getElementById(`lista-${vacanteId}`);
             let candidatos = [...window[`candidatos_${vacanteId}`]];
-
-            if (porEntrevista) {
-                candidatos.sort((a, b) => (b.calificacion_entrevista || 0) - (a.calificacion_entrevista || 0));
-            } else {
-                candidatos.sort((a, b) => b.match_score - a.match_score);
-            }
-
+            candidatos.sort((a, b) => porEntrevista ? (b.calificacion_entrevista || 0) - (a.calificacion_entrevista || 0) : b.match_score - a.match_score);
             listaBody.innerHTML = candidatos.slice(0, 3).map((c, index) => `
                 <div class="talento-item d-flex align-items-center py-2 border-bottom ${index === 0 ? 'top-1' : ''}">
                     <div class="posicion-top me-3 fw-bold ${index === 0 ? 'text-primary' : 'text-muted'}">#${index + 1}</div>
-                    <div class="flex-grow-1">
-                        <h6 class="mb-0 small fw-bold text-dark">${c.nombre}</h6>
-                        <small class="text-muted">${c.email}</small>
-                    </div>
-                    <div class="text-end">
-                        <span class="fw-bold ${porEntrevista ? 'text-success' : 'text-primary'}">
-                            ${porEntrevista ? (c.calificacion_entrevista || '--') + ' pts' : Math.round(c.match_score) + '%'}
-                        </span>
-                    </div>
-                </div>
-            `).join('');
+                    <div class="flex-grow-1"><h6 class="mb-0 small fw-bold text-dark">${c.nombre}</h6><small class="text-muted">${c.email}</small></div>
+                    <div class="text-end"><span class="fw-bold ${porEntrevista ? 'text-success' : 'text-primary'}">${porEntrevista ? (c.calificacion_entrevista || '--') + ' pts' : Math.round(c.match_score) + '%'}</span></div>
+                </div>`).join('');
         }
 
-        function cerrarSesion() {
-            localStorage.removeItem('token');
-            window.location.href = "Login.html";
-        }
+        function cerrarSesion() { localStorage.removeItem('token'); window.location.href = "Login.html"; }
     </script>
 </body>
 </html>

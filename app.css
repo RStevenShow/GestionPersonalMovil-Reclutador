@@ -7,19 +7,19 @@
 /* =====================================================
    1. RESET Y VARIABLES GLOBALES
 ===================================================== */
+
+
+
 :root {
     --color-primario: #3b82f6;
     --color-secundario: #8b5cf6;
     --color-gradiente: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     --fondo-app: #f8fafc;
     --texto-oscuro: #1e293b;
-    --texto-claro: #64748b;
+    --texto-claro: #526071;
     --sombra-suave: 0 4px 15px rgba(0,0,0,0.04);
 }
-@font-face {
-  font-family: 'bootstrap-icons';
-  font-display: swap;
-}
+
 * {
     margin: 0;
     padding: 0;

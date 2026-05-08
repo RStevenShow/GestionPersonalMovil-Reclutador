@@ -1,174 +1,487 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mi Perfil - MarkNic</title>
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
-  <link rel="stylesheet" href="app.css" />
-  
-  <link rel="manifest" href="manifest.json" />
+  <head>
+    <meta charset="UTF-8" />
 
-  <meta name="theme-color" content="#2563eb" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-</head>
+    <!-- Viewport accesible -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<body class="pantalla-menu">
-  <header class="encabezado-menu text-center position-relative">
-    <!-- Logo en la esquina superior izquierda -->
-    <div class="position-absolute top-0 start-0 p-3">
-        <img src="logo.png" alt="Logo" style="width: 45px; height: auto; filter: brightness(0) invert(1); opacity: 0.8;">
-    </div>
+    <!-- SEO -->
+    <title>Mi Perfil - MarkNic</title>
 
-    <div class="container py-4">
+    <meta
+      name="description"
+      content="Gestiona tu perfil de reclutador, preferencias, vacantes y configuración de cuenta en MarkNic AI."
+    />
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="app.css" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+  </head>
+
+  <body class="pantalla-menu">
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+
+    <header class="encabezado-menu text-center position-relative">
+      <!-- Logo -->
+      <div class="position-absolute top-0 start-0 p-3">
+        <img
+          src="logo.png"
+          alt="Logo de MarkNic"
+          style="
+            width: 45px;
+            height: auto;
+            filter: brightness(0) invert(1);
+            opacity: 0.95;
+          "
+        />
+      </div>
+
+      <div class="container py-4">
         <div class="position-relative d-inline-block">
-            <!-- Imagen por defecto si no hay nada (usando un placeholder) -->
-            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" 
-                 id="img-perfil" 
-                 class="rounded-circle shadow border border-3 border-white bg-white"
-                 style="width: 100px; height: 100px; object-fit: cover" />
-            
-            <label for="subir-foto" class="btn btn-light btn-sm position-absolute bottom-0 end-0 rounded-circle shadow-sm">
-                <i class="bi bi-camera-fill"></i>
-            </label>
-            <input type="file" id="subir-foto" class="d-none" accept="image/*" />
-        </div>
-        
-        <h2 class="h5 fw-bold mt-3 mb-0 text-white" id="perfil-nombre" onclick="abrirEditor('nombre')" style="cursor: pointer">
-            Cargando... <i class="bi bi-pencil-square small opacity-50"></i>
-        </h2>
-        <p class="small opacity-75 text-white" id="perfil-puesto">
-            Reclutador MarkNica
-        </p>
-    </div>
-</header>
-  
+          <!-- Imagen de perfil -->
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            id="img-perfil"
+            alt="Foto de perfil del usuario"
+            class="rounded-circle shadow border border-3 border-white bg-white"
+            style="width: 100px; height: 100px; object-fit: cover"
+          />
 
-  <main class="container p-3 fade">
-    
-    <h6 class="text-muted small fw-bold mb-3 ms-2 text-uppercase">Información de Cuenta</h6>
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-      <div class="list-group list-group-flush">
-        <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0 border-bottom"
-          onclick="abrirEditor('email')" style="cursor: pointer">
-          <div>
-            <small class="text-muted d-block">Correo Electrónico</small>
-            <span id="perfil-email" class="fw-medium">...</span>
-          </div>
-          <i class="bi bi-chevron-right text-muted"></i>
+          <!-- Label oculto accesible -->
+          <label for="subir-foto" class="visually-hidden">
+            Subir foto de perfil
+          </label>
+
+          <!-- Botón cámara -->
+          <label
+            for="subir-foto"
+            class="btn btn-light btn-sm position-absolute bottom-0 end-0 rounded-circle shadow-sm"
+            aria-label="Cambiar foto de perfil"
+          >
+            <i class="bi bi-camera-fill" aria-hidden="true"></i>
+          </label>
+
+          <!-- Input -->
+          <input
+            type="file"
+            id="subir-foto"
+            class="d-none"
+            accept="image/*"
+          />
         </div>
-        <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
-          <div>
-            <small class="text-muted d-block">Contraseña</small>
-            <span class="fw-medium text-muted">••••••••</span>
+
+        <!-- Heading principal -->
+        <h1
+          class="h5 fw-bold mt-3 mb-0 text-white"
+          id="perfil-nombre"
+          onclick="abrirEditor('nombre')"
+          style="cursor: pointer"
+        >
+          Cargando...
+          <i
+            class="bi bi-pencil-square small opacity-75"
+            aria-hidden="true"
+          ></i>
+        </h1>
+
+        <p class="small text-white mt-1" id="perfil-puesto">
+          Reclutador MarkNica
+        </p>
+      </div>
+    </header>
+
+    <!-- ===================================================== -->
+    <!-- MAIN -->
+    <!-- ===================================================== -->
+
+    <main class="container p-3 fade">
+      <!-- ===================================================== -->
+      <!-- INFORMACIÓN -->
+      <!-- ===================================================== -->
+
+      <h2 class="h6 text-dark small fw-bold mb-3 ms-2 text-uppercase">
+        Información de Cuenta
+      </h2>
+
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="list-group list-group-flush">
+          <!-- Email -->
+          <button
+            type="button"
+            class="list-group-item d-flex justify-content-between align-items-center py-3 border-0 border-bottom bg-white w-100 text-start"
+            onclick="abrirEditor('email')"
+            aria-label="Editar correo electrónico"
+          >
+            <div>
+              <small class="text-secondary d-block">
+                Correo Electrónico
+              </small>
+
+              <span id="perfil-email" class="fw-medium">...</span>
+            </div>
+
+            <i
+              class="bi bi-chevron-right text-secondary"
+              aria-hidden="true"
+            ></i>
+          </button>
+
+          <!-- Password -->
+          <div
+            class="list-group-item d-flex justify-content-between align-items-center py-3 border-0"
+          >
+            <div>
+              <small class="text-secondary d-block">
+                Contraseña
+              </small>
+
+              <span class="fw-medium text-secondary">
+                ••••••••
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold"
+              onclick="abrirEditor('password')"
+              aria-label="Cambiar contraseña"
+            >
+              Cambiar
+            </button>
           </div>
-          <button class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" onclick="abrirEditor('password')">
-            Cambiar
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- PREFERENCIAS -->
+      <!-- ===================================================== -->
+
+      <h2 class="h6 text-dark small fw-bold mb-3 ms-2 text-uppercase">
+        Preferencias del Dispositivo
+      </h2>
+
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="list-group list-group-flush">
+          <div
+            class="list-group-item d-flex justify-content-between align-items-center py-3 border-0"
+          >
+            <div class="d-flex align-items-center">
+              <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                <i
+                  class="bi bi-bell-fill text-primary"
+                  aria-hidden="true"
+                ></i>
+              </div>
+
+              <div>
+                <span class="fw-medium d-block">
+                  Centro de Alertas
+                </span>
+
+                <small style="color: #495057">
+                  Notificar matches nuevos y recordatorios de entrevistas
+                </small>
+              </div>
+            </div>
+
+            <div class="form-check form-switch">
+              <label
+                for="switchNotificaciones"
+                class="visually-hidden"
+              >
+                Activar o desactivar notificaciones
+              </label>
+
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="switchNotificaciones"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- VACANTES -->
+      <!-- ===================================================== -->
+
+      <div
+        class="d-flex justify-content-between align-items-center mb-3 ms-2"
+      >
+        <h2 class="h6 text-dark small fw-bold mb-0 text-uppercase">
+          Mis Vacantes Publicadas
+        </h2>
+
+        <span class="badge bg-primary rounded-pill" id="badge-vacantes">
+          0
+        </span>
+      </div>
+
+      <div id="lista-mis-vacantes" class="vstack gap-2 mb-4">
+        <div class="text-center py-3 opacity-75">
+          <div
+            class="spinner-border spinner-border-sm text-primary"
+            role="status"
+            aria-label="Cargando vacantes"
+          ></div>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- ELIMINAR CUENTA -->
+      <!-- ===================================================== -->
+
+      <div class="px-2 mb-5">
+        <button
+          type="button"
+          class="btn btn-outline-danger w-100 rounded-4 py-3 fw-bold"
+          onclick="confirmarBajaCuenta()"
+          aria-label="Eliminar mi cuenta"
+        >
+          <i
+            class="bi bi-person-x me-2"
+            aria-hidden="true"
+          ></i>
+
+          Eliminar mi cuenta
+        </button>
+      </div>
+    </main>
+
+    <!-- ===================================================== -->
+    <!-- NAVBAR -->
+    <!-- ===================================================== -->
+
+    <nav class="barra-inferior-pro" aria-label="Menú principal">
+      <a
+        href="menu.html"
+        class="link-menu"
+        aria-label="Inicio"
+      >
+        <i class="bi bi-house" aria-hidden="true"></i>
+        <span>Inicio</span>
+      </a>
+
+      <a
+        href="vacantes.html"
+        class="link-menu"
+        aria-label="Vacantes"
+      >
+        <i class="bi bi-briefcase" aria-hidden="true"></i>
+        <span>Vacantes</span>
+      </a>
+
+      <a
+        href="agenda.html"
+        class="link-menu"
+        aria-label="Agenda"
+      >
+        <i class="bi bi-calendar" aria-hidden="true"></i>
+        <span>Agenda</span>
+      </a>
+
+      <a
+        href="perfil.html"
+        class="link-menu activo"
+        aria-label="Perfil"
+      >
+        <i class="bi bi-person" aria-hidden="true"></i>
+        <span>Perfil</span>
+      </a>
+    </nav>
+
+    <!-- ===================================================== -->
+    <!-- CONFIRMAR ELIMINAR VACANTE -->
+    <!-- ===================================================== -->
+
+    <div id="confirm-container" class="d-none">
+      <div class="status-box">
+        <i
+          class="bi bi-exclamation-triangle-fill text-warning fs-1"
+          aria-hidden="true"
+        ></i>
+
+        <p class="mt-3 fw-bold">
+          ¿Eliminar esta vacante?
+        </p>
+
+        <div class="d-flex gap-2 mt-3">
+          <button
+            type="button"
+            id="confirm-cancel"
+            class="btn btn-light w-100 rounded-pill fw-bold"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            id="confirm-accept"
+            class="btn btn-danger w-100 rounded-pill fw-bold"
+          >
+            Eliminar
           </button>
         </div>
       </div>
     </div>
 
-    <h6 class="text-muted small fw-bold mb-3 ms-2 text-uppercase">Preferencias del Dispositivo</h6>
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-      <div class="list-group list-group-flush">
-        <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
-          <div class="d-flex align-items-center">
-            <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
-              <i class="bi bi-bell-fill text-primary"></i>
-            </div>
-            <div>
-              <span class="fw-medium d-block">Centro de Alertas</span>
-              <small class="text-muted">Notificar matches nuevos y Recordatorios de entrevistas</small>
-            </div>
+    <!-- ===================================================== -->
+    <!-- STATUS -->
+    <!-- ===================================================== -->
+
+    <div id="status-container" class="d-none">
+      <div class="status-box">
+        <div
+          id="status-spinner"
+          class="spinner-border text-primary"
+          role="status"
+          aria-label="Procesando"
+        ></div>
+
+        <i
+          id="status-check"
+          class="bi bi-check-circle-fill text-success d-none fs-1"
+          aria-hidden="true"
+        ></i>
+
+        <p id="status-texto" class="mt-2 mb-0 fw-bold">
+          Procesando...
+        </p>
+      </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- BOTTOM SHEET -->
+    <!-- ===================================================== -->
+
+    <div
+      id="sheet-overlay"
+      class="sheet-overlay d-none"
+      onclick="cerrarSheet()"
+      aria-hidden="true"
+    ></div>
+
+    <div
+      id="bottom-sheet"
+      class="bottom-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="sheet-titulo"
+    >
+      <div class="sheet-header">
+        <div class="sheet-handle"></div>
+
+        <h2 class="h5 fw-bold mt-2" id="sheet-titulo">
+          Editar Datos
+        </h2>
+      </div>
+
+      <div class="sheet-body p-4">
+        <div id="form-editar-dato">
+          <div class="campo-app mb-4">
+            <label
+              for="input-nuevo-valor"
+              id="label-input"
+              class="small fw-bold text-secondary mb-2 text-uppercase"
+            >
+              Nuevo Valor
+            </label>
+
+            <input
+              type="text"
+              id="input-nuevo-valor"
+              class="form-control rounded-3"
+            />
           </div>
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="switchNotificaciones" />
-          </div>
+
+          <button
+            type="button"
+            class="boton-primario w-100 py-3 rounded-4 fw-bold"
+            onclick="guardarCambioSheet()"
+          >
+            <i
+              class="bi bi-save me-2"
+              aria-hidden="true"
+            ></i>
+
+            Guardar Cambios
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mb-3 ms-2">
-      <h6 class="text-muted small fw-bold mb-0 text-uppercase">Mis Vacantes Publicadas</h6>
-      <span class="badge bg-primary rounded-pill" id="badge-vacantes">0</span>
-    </div>
+    <!-- ===================================================== -->
+    <!-- CONFIRMAR BAJA -->
+    <!-- ===================================================== -->
 
-    <div id="lista-mis-vacantes" class="vstack gap-2 mb-4">
-      <div class="text-center py-3 opacity-50">
-        <div class="spinner-border spinner-border-sm text-primary"></div>
-      </div>
-    </div>
+    <div id="confirm-baja-container" class="d-none">
+      <div class="status-box border border-danger">
+        <i
+          class="bi bi-exclamation-octagon-fill text-danger fs-1"
+          aria-hidden="true"
+        ></i>
 
-    <div class="px-2 mb-5">
-      <button class="btn btn-outline-danger w-100 rounded-4 py-3 fw-bold" onclick="confirmarBajaCuenta()">
-        <i class="bi bi-person-x me-2"></i> Eliminar mi cuenta
-      </button>
-    </div>
-  </main>
+        <h2 class="h5 mt-3 fw-bold text-danger">
+          ¿ELIMINAR MI CUENTA?
+        </h2>
 
-  <nav class="barra-inferior-pro">
-    <a href="menu.html" class="link-menu"><i class="bi bi-house"></i><span>Inicio</span></a>
-    <a href="vacantes.html" class="link-menu"><i class="bi bi-briefcase"></i><span>Vacantes</span></a>
-    <a href="agenda.html" class="link-menu"><i class="bi bi-calendar"></i><span>Agenda</span></a>
-    <a href="perfil.html" class="link-menu activo"><i class="bi bi-person"></i><span>Perfil</span></a>
-  </nav>
+        <p style="color: #495057">
+          Esta acción es irreversible.
+        </p>
 
-  <div id="confirm-container" class="d-none">
-    <div class="status-box">
-      <i class="bi bi-exclamation-triangle-fill text-warning fs-1"></i>
-      <p class="mt-3 fw-bold">¿Eliminar esta vacante?</p>
-      <div class="d-flex gap-2 mt-3">
-        <button id="confirm-cancel" class="btn btn-light w-100 rounded-pill fw-bold">Cancelar</button>
-        <button id="confirm-accept" class="btn btn-danger w-100 rounded-pill fw-bold">Eliminar</button>
-      </div>
-    </div>
-  </div>
+        <div class="d-flex gap-2 mt-3">
+          <button
+            type="button"
+            id="baja-cancel"
+            class="btn btn-light w-100 rounded-pill fw-bold"
+          >
+            No, volver
+          </button>
 
-  <div id="status-container" class="d-none">
-    <div class="status-box">
-      <div id="status-spinner" class="spinner-border text-primary"></div>
-      <i id="status-check" class="bi bi-check-circle-fill text-success d-none fs-1"></i>
-      <p id="status-texto" class="mt-2 mb-0 fw-bold">Procesando...</p>
-    </div>
-  </div>
-
-  <div id="sheet-overlay" class="sheet-overlay d-none" onclick="cerrarSheet()"></div>
-  <div id="bottom-sheet" class="bottom-sheet">
-    <div class="sheet-header">
-      <div class="sheet-handle"></div>
-      <h5 class="fw-bold mt-2" id="sheet-titulo">Editar Datos</h5>
-    </div>
-    <div class="sheet-body p-4">
-      <div id="form-editar-dato">
-        <div class="campo-app mb-4">
-          <label id="label-input" class="small fw-bold text-muted mb-2 text-uppercase">Nuevo Valor</label>
-          <input type="text" id="input-nuevo-valor" class="form-control rounded-3" />
+          <button
+            type="button"
+            id="baja-accept"
+            class="btn btn-danger w-100 rounded-pill fw-bold"
+          >
+            Sí, borrar todo
+          </button>
         </div>
-        <button class="boton-primario w-100 py-3 rounded-4 fw-bold" onclick="guardarCambioSheet()">
-          <i class="bi bi-save me-2"></i> Guardar Cambios
-        </button>
       </div>
     </div>
-  </div>
 
-  <div id="confirm-baja-container" class="d-none">
-    <div class="status-box border border-danger">
-      <i class="bi bi-exclamation-octagon-fill text-danger fs-1"></i>
-      <h5 class="mt-3 fw-bold text-danger">¿ELIMINAR MI CUENTA?</h5>
-      <p class="small text-muted">Esta acción es irreversible.</p>
-      <div class="d-flex gap-2 mt-3">
-        <button id="baja-cancel" class="btn btn-light w-100 rounded-pill fw-bold">No, volver</button>
-        <button id="baja-accept" class="btn btn-danger w-100 rounded-pill fw-bold">Sí, borrar todo</button>
-      </div>
-    </div>
-  </div>
+    <!-- ===================================================== -->
+    <!-- SCRIPTS -->
+    <!-- ===================================================== -->
 
-    <script src="app.js"defer></script>
-  <script src="perfil.js" defer></script>
-
-</body>
+    <script src="app.js" defer></script>
+    <script src="perfil.js" defer></script>
+  </body>
 </html>

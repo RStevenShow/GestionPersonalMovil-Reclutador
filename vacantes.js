@@ -113,29 +113,31 @@ function irADetalle(id) {
 
 // 4. CREAR VACANTE
 async function crearVacante() {
-    const token = localStorage.getItem('token');
-    const titleInput = document.getElementById('title');
-    const descInput = document.getElementById('description');
-
-    if (!titleInput.value || !descInput.value) {
-        alert("Por favor completa el título y la descripción.");
+    const form = document.getElementById('formVacante');
+    
+    // 1. VALIDACIÓN: Si el formulario no es válido, detenemos la ejecución
+    if (!form.checkValidity()) {
+        form.reportValidity(); // Muestra los avisos visuales en los campos vacíos
         return;
     }
 
-    // Estructuramos los datos, capturando las skills para la IA de forma segura
+    const token = localStorage.getItem('token');
+    if (!token) return window.location.href = "Login.html";
+
+    // 2. CAPTURA DE DATOS (Solo llegamos aquí si todo está lleno)
     const datosVacante = {
-        title: titleInput.value,
-        description_original: descInput.value,
-        // --- NUEVO CAMPO INTEGRADO ---
-        skills_clave: document.getElementById('skills_clave') ? document.getElementById('skills_clave').value : "",
-        // -----------------------------
-        salary_range: document.getElementById('salary_range').value || null,
+        title: document.getElementById('title').value,
+        description_original: document.getElementById('description').value,
+        skills_clave: document.getElementById('skills_clave').value,
+        salary_range: document.getElementById('salary_range').value,
         experience_years: parseInt(document.getElementById('experience_years').value) || 0,
-        location: document.getElementById('location').value || "Remoto",
-        priority: document.getElementById('priority').value || "medium",
-        max_candidatos: parseInt(document.getElementById('max_candidatos')?.value) || 1
+        responsibilities: document.getElementById('responsibilities').value,
+        location: document.getElementById('location').value,
+        priority: document.getElementById('priority').value,
+        max_candidatos: parseInt(document.getElementById('max_candidatos').value) || 1
     };
 
+    // 3. PROCESO DE UI
     mostrarStatusPro('cargando', 'IA analizando puesto...');
 
     try {
@@ -156,16 +158,17 @@ async function crearVacante() {
                 if (modal) modal.hide();
                 
                 ocultarStatusPro();
-                document.getElementById('formVacante').reset();
-                obtenerVacantes();
+                form.reset(); // Limpia el formulario
+                obtenerVacantes(); // Refresca la lista
             }, 1200);
         } else {
             ocultarStatusPro();
-            alert("Error al crear la vacante. Revisa la consola.");
+            alert("Hubo un problema al guardar la vacante.");
         }
     } catch (error) { 
         ocultarStatusPro(); 
-        console.error("Error en la petición:", error);
+        console.error("Error:", error);
+        alert("Error de conexión con el servidor.");
     }
 }
 

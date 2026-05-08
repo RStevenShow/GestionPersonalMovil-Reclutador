@@ -160,7 +160,7 @@
               <div class="row g-2">
                 <div class="col-7">
                   <div class="campo-app">
-                    <label>Rango Salarial</label>
+                    <label>Rango Salarial *</label>
                     <input
                       type="text"
                       id="salary_range"
@@ -171,7 +171,7 @@
                 </div>
                 <div class="col-5">
                   <div class="campo-app">
-                    <label>Exp. (Años)</label>
+                    <label>Exp. (Años) *</label>
                     <input
                       type="number"
                       id="experience_years"
@@ -195,20 +195,32 @@
 
               <div class="campo-app">
                 <label>
-                  <i class=" text-primary me-1"></i> Skills Clave <span style="font-weight: normal; opacity: 0.7;">(Para la IA)</span>
+                  <i class="bi bi-cpu text-primary me-1"></i> Skills Clave *
+                  <span style="font-weight: normal; opacity: 0.7"
+                    >(Para la IA)</span
+                  >
                 </label>
                 <input
                   type="text"
                   id="skills_clave"
                   placeholder="Ej: Python, React, Liderazgo, SQL"
+                  required
                 />
-                <small style="display: block; font-size: 0.75rem; color: #6c757d; margin-top: 4px; line-height: 1.2;">
-                  Separa por comas. La Inteligencia Artificial usará esto para buscar el match perfecto.
+                <small
+                  style="
+                    display: block;
+                    font-size: 0.75rem;
+                    color: #6c757d;
+                    margin-top: 4px;
+                    line-height: 1.2;
+                  "
+                >
+                  Separa por comas. La IA usará esto para el match perfecto.
                 </small>
               </div>
 
               <div class="campo-app">
-                <label>Responsabilidades</label>
+                <label>Responsabilidades *</label>
                 <textarea
                   id="responsibilities"
                   rows="2"
@@ -220,8 +232,8 @@
               <div class="row g-2">
                 <div class="col-6">
                   <div class="campo-app">
-                    <label>Prioridad</label>
-                    <select id="priority">
+                    <label>Prioridad *</label>
+                    <select id="priority" required>
                       <option value="high">Alta</option>
                       <option value="medium" selected>Media</option>
                       <option value="low">Baja</option>
@@ -230,7 +242,7 @@
                 </div>
                 <div class="col-6">
                   <div class="campo-app">
-                    <label>Ubicación</label>
+                    <label>Ubicación *</label>
                     <input
                       type="text"
                       id="location"
@@ -242,7 +254,7 @@
               </div>
 
               <div class="campo-app">
-                <label>Máximo de candidatos</label>
+                <label>Máximo de candidatos *</label>
                 <input
                   type="number"
                   id="max_candidatos"

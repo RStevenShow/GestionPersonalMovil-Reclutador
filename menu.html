@@ -3,12 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Accesibilidad: Permitimos el zoom para mejorar el puntaje y ayudar a usuarios con problemas visuales -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - MarkNica AI</title>
+    <!-- SEO: Añadido para subir el puntaje de 91 a 100 -->
+    <meta name="description" content="Panel de gestión de reclutamiento inteligente de MarkNica AI.">
 
+    <!-- Rendimiento: Preconexión para reducir el tiempo de carga de recursos externos -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    
+    <!-- CSS de Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Rendimiento: Chart.js con 'defer' para que no bloquee el dibujo de la página -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    
     <link rel="stylesheet" href="app.css">
     <link rel="manifest" href="manifest.json">
 
@@ -22,11 +32,13 @@
     <header class="encabezado-menu shadow-sm">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
-                <h4 class="mb-0 fw-bold">
-                    <img src="logo.png" alt="logo"class="logo-navbar-chico">
+                <h4 class="mb-0 fw-bold d-flex align-items-center">
+                    <!-- Rendimiento: Dimensiones explícitas para evitar saltos (CLS) -->
+                    <img src="logo.png" alt="MarkNica Logo" width="45" height="45" class="logo-navbar-chico me-2">
                     <span id="nombreApp">MarkNic AI</span>
                 </h4>
-                <button onclick="cerrarSesion()" class="btn btn-sm btn-outline-light border-0">
+                <!-- Accesibilidad: Se añadió aria-label para que los lectores de pantalla entiendan el botón -->
+                <button onclick="cerrarSesion()" class="btn btn-sm btn-outline-light border-0" aria-label="Cerrar sesión">
                     <i class="bi bi-box-arrow-right fs-4"></i>
                 </button>
             </div>
@@ -60,7 +72,7 @@
     <main class="container mt-4 fade">
         <h5 id="tituloAcciones" class="fw-bold mb-3 text-dark">Acciones inmediatas</h5>
 
-        <div id="contenedor-acciones">
+        <div id="contenedor-actions">
             <div id="accion1" class="tarjeta-accion prioridad-alta p-3 mb-3 d-flex align-items-center">
                 <div class="spinner-border spinner-border-sm text-danger me-3" role="status"></div>
                 <span class="text-secondary fw-medium">Sincronizando con la nube...</span>
@@ -93,12 +105,11 @@
                         <small class="text-muted small">Top 3 candidatos</small>
                     </div>
                     <div class="form-check form-switch custom-switch">
-                        <input class="form-check-input" type="checkbox" role="switch">
+                        <input class="form-check-input" type="checkbox" role="switch" aria-label="Cambiar vista IA o Entrevista">
                         <label class="form-check-label small fw-bold text-muted">IA / Entrevista</label>
                     </div>
                 </div>
-                <div class="card-body p-3 lista-talentos">
-                    </div>
+                <div class="card-body p-3 lista-talentos"></div>
             </div>
         </template>
     </main>
@@ -111,230 +122,153 @@
     </nav>
 
     <script>
-const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
-const token = localStorage.getItem('token');
-let graficoReferencia = null;
+        const API_BASE_URL = "https://reclutamiento-backend.onrender.com";
+        const token = localStorage.getItem('token');
+        let graficoReferencia = null;
 
-if (!token) {
-    window.location.href = "Login.html";
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    obtenerDatosDashboard();
-    cargarRankingVacantes();
-});
-
-// ===============================
-// 🔹 DASHBOARD STATS
-// ===============================
-async function obtenerDatosDashboard() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard-stats`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (response.status === 401) {
-            cerrarSesion();
-            return;
+        if (!token) {
+            window.location.href = "Login.html";
         }
 
-        if (!response.ok) throw new Error("Error en servidor");
+        // Rendimiento: Fragmentamos la carga para reducir el Total Blocking Time (TBT)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Prioridad 1: Datos de arriba (Dashboard)
+            obtenerDatosDashboard();
 
-        const data = await response.json();
-     //  console.log("DATA DASHBOARD:", data);
+            // Prioridad 2: Ranking (esperamos un poco para no saturar el hilo principal)
+            setTimeout(() => {
+                cargarRankingVacantes();
+            }, 300);
+        });
 
-        renderizarPantalla(data);
+        async function obtenerDatosDashboard() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/dashboard-stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
 
-    } catch (error) {
-        console.error("Error:", error);
+                if (response.status === 401) {
+                    cerrarSesion();
+                    return;
+                }
 
-        document.getElementById("nombreApp").textContent = "Modo Offline";
-        document.getElementById("accion1").innerHTML =
-            `<i class="bi bi-wifi-off text-danger fs-5 me-3"></i> <span>Despertando servidor...</span>`;
-        document.getElementById("accion2").innerHTML =
-            `<i class="bi bi-arrow-clockwise text-primary fs-5 me-3"></i> <span>Reintentando conexión</span>`;
-    }
-}
+                if (!response.ok) throw new Error("Error en servidor");
+                const data = await response.json();
+                renderizarPantalla(data);
 
-// ===============================
-// 🔹 RENDER UI
-// ===============================
-function renderizarPantalla(data) {
-    document.getElementById("nombreApp").textContent = data.appNombre || "MarkNica AI";
-    document.getElementById("datoCandidatos").textContent = data.candidatos || 0;
-    document.getElementById("datoEntrevistas").textContent =
-        data.proceso?.entrevistas || 0;
-    document.getElementById("datoMatch").textContent =
-        (data.match || 0) + "%";
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("nombreApp").textContent = "Modo Offline";
+                document.getElementById("accion1").innerHTML = `<i class="bi bi-wifi-off text-danger fs-5 me-3"></i> <span>Despertando servidor...</span>`;
+                document.getElementById("accion2").innerHTML = `<i class="bi bi-arrow-clockwise text-primary fs-5 me-3"></i> <span>Reintentando conexión</span>`;
+            }
+        }
 
-    const txtAccion1 = data.acciones?.[0] || "Todo al día";
-    const txtAccion2 = data.acciones?.[1] || "Sin novedades";
+        function renderizarPantalla(data) {
+            document.getElementById("nombreApp").textContent = data.appNombre || "MarkNica AI";
+            document.getElementById("datoCandidatos").textContent = data.candidatos || 0;
+            document.getElementById("datoEntrevistas").textContent = data.proceso?.entrevistas || 0;
+            document.getElementById("datoMatch").textContent = (data.match || 0) + "%";
 
-    document.getElementById("accion1").innerHTML =
-        `<i class="bi bi-briefcase text-danger fs-5 me-3"></i><span>${txtAccion1}</span>`;
+            const txtAccion1 = data.acciones?.[0] || "Todo al día";
+            const txtAccion2 = data.acciones?.[1] || "Sin novedades";
 
-    document.getElementById("accion2").innerHTML =
-        `<i class="bi bi-calendar-check text-warning fs-5 me-3"></i><span>${txtAccion2}</span>`;
+            document.getElementById("accion1").innerHTML = `<i class="bi bi-briefcase text-danger fs-5 me-3"></i><span>${txtAccion1}</span>`;
+            document.getElementById("accion2").innerHTML = `<i class="bi bi-calendar-check text-warning fs-5 me-3"></i><span>${txtAccion2}</span>`;
 
-    dibujarGrafico(data.proceso || {});
-}
+            dibujarGrafico(data.proceso || {});
+        }
 
-// ===============================
-// 🔹 GRAFICO PIPELINE REAL
-// ===============================
-function dibujarGrafico(proceso) {
-    const canvas = document.getElementById("graficoProceso");
-    if (!canvas) return;
+        function dibujarGrafico(proceso) {
+            const canvas = document.getElementById("graficoProceso");
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (graficoReferencia) graficoReferencia.destroy();
 
-    const ctx = canvas.getContext('2d');
+            const screening = proceso.screening || 0;
+            const entrevistas = proceso.entrevistas || 0;
+            const evaluados = proceso.oferta || 0;
+            const top = proceso.contratados || 0;
+            const total = screening + entrevistas + evaluados + top;
 
-    if (graficoReferencia) graficoReferencia.destroy();
+            const datos = total === 0 ? [1] : [screening, entrevistas, evaluados, top];
+            const etiquetas = total === 0 ? ["Sin datos"] : ["CV sin revisar", "Entrevistas", "Evaluados", "Top candidatos"];
+            const colores = total === 0 ? ["#e2e8f0"] : ["#f59e0b", "#3b82f6", "#8b5cf6", "#10b981"];
 
-    // 🔥 DATOS REALES DEL BACKEND
-    const screening = proceso.screening || 0;        // CVs sin entrevista
-    const entrevistas = proceso.entrevistas || 0;    // Entrevistas creadas
-    const evaluados = proceso.oferta || 0;           // Entrevistas completadas
-    const top = proceso.contratados || 0;            // Mejores candidatos
-
-    const total = screening + entrevistas + evaluados + top;
-
-    const datos = total === 0
-        ? [1]
-        : [screening, entrevistas, evaluados, top];
-
-    const etiquetas = total === 0
-        ? ["Sin datos"]
-        : [
-            "CV sin revisar",
-            "Entrevistas",
-            "Evaluados",
-            "Top candidatos"
-        ];
-
-    const colores = total === 0
-        ? ["#e2e8f0"]
-        : [
-            "#f59e0b", // amarillo
-            "#3b82f6", // azul
-            "#8b5cf6", // morado
-            "#10b981"  // verde
-        ];
-
-    graficoReferencia = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-            labels: etiquetas,
-            datasets: [{
-                data: datos,
-                backgroundColor: colores,
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: "75%",
-            plugins: {
-                legend: {
-                    position: "bottom",
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true,
-                        font: { size: 11 }
-                    }
+            graficoReferencia = new Chart(ctx, {
+                type: "doughnut",
+                data: {
+                    labels: etiquetas,
+                    datasets: [{ data: datos, backgroundColor: colores, borderWidth: 0 }]
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.label}: ${context.raw}`;
-                        }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: "75%",
+                    plugins: {
+                        legend: { position: "bottom", labels: { padding: 15, usePointStyle: true, font: { size: 11 } } }
                     }
                 }
+            });
+        }
+
+        async function cargarRankingVacantes() {
+            const contenedor = document.getElementById('contenedor-vacantes-ranking');
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/dashboard-vacantes-ranking`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                contenedor.innerHTML = '';
+
+                data.vacantes.forEach(vacante => {
+                    const temp = document.getElementById('temp-vacante').content.cloneNode(true);
+                    temp.querySelector('.titulo-vacante').innerText = vacante.titulo;
+                    const switchInput = temp.querySelector('.form-check-input');
+                    switchInput.setAttribute('onchange', `renderizarListaTalentos('${vacante.id}', this.checked)`);
+                    
+                    window[`candidatos_${vacante.id}`] = vacante.candidatos;
+                    const listaBody = temp.querySelector('.lista-talentos');
+                    listaBody.id = `lista-${vacante.id}`;
+
+                    contenedor.appendChild(temp);
+                    renderizarListaTalentos(vacante.id, false);
+                });
+            } catch (error) {
+                console.error("Error cargando ranking:", error);
             }
         }
-    });
-}
 
-// ===============================
-// 🔹 RANKING VACANTES
-// ===============================
-async function cargarRankingVacantes() {
-    const contenedor = document.getElementById('contenedor-vacantes-ranking');
+        function renderizarListaTalentos(vacanteId, porEntrevista) {
+            const listaBody = document.getElementById(`lista-${vacanteId}`);
+            let candidatos = [...window[`candidatos_${vacanteId}`]];
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/dashboard-vacantes-ranking`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+            if (porEntrevista) {
+                candidatos.sort((a, b) => (b.calificacion_entrevista || 0) - (a.calificacion_entrevista || 0));
+            } else {
+                candidatos.sort((a, b) => b.match_score - a.match_score);
+            }
 
-        const data = await response.json();
-        contenedor.innerHTML = '';
+            listaBody.innerHTML = candidatos.slice(0, 3).map((c, index) => `
+                <div class="talento-item d-flex align-items-center py-2 border-bottom ${index === 0 ? 'top-1' : ''}">
+                    <div class="posicion-top me-3 fw-bold ${index === 0 ? 'text-primary' : 'text-muted'}">#${index + 1}</div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0 small fw-bold text-dark">${c.nombre}</h6>
+                        <small class="text-muted">${c.email}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="fw-bold ${porEntrevista ? 'text-success' : 'text-primary'}">
+                            ${porEntrevista ? (c.calificacion_entrevista || '--') + ' pts' : Math.round(c.match_score) + '%'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-        data.vacantes.forEach(vacante => {
-            const temp = document.getElementById('temp-vacante').content.cloneNode(true);
-            temp.querySelector('.titulo-vacante').innerText = vacante.titulo;
-
-            const switchInput = temp.querySelector('.form-check-input');
-            switchInput.setAttribute(
-                'onchange',
-                `renderizarListaTalentos('${vacante.id}', this.checked)`
-            );
-
-            window[`candidatos_${vacante.id}`] = vacante.candidatos;
-
-            const listaBody = temp.querySelector('.lista-talentos');
-            listaBody.id = `lista-${vacante.id}`;
-
-            contenedor.appendChild(temp);
-            renderizarListaTalentos(vacante.id, false);
-        });
-
-    } catch (error) {
-        console.error("Error cargando ranking:", error);
-    }
-}
-
-// ===============================
-// 🔹 LISTA TALENTOS
-// ===============================
-function renderizarListaTalentos(vacanteId, porEntrevista) {
-    const listaBody = document.getElementById(`lista-${vacanteId}`);
-    let candidatos = [...window[`candidatos_${vacanteId}`]];
-
-    if (porEntrevista) {
-        candidatos.sort((a, b) =>
-            (b.calificacion_entrevista || 0) - (a.calificacion_entrevista || 0)
-        );
-    } else {
-        candidatos.sort((a, b) => b.match_score - a.match_score);
-    }
-
-    listaBody.innerHTML = candidatos.slice(0, 3).map((c, index) => `
-        <div class="talento-item d-flex align-items-center py-2 border-bottom ${index === 0 ? 'top-1' : ''}">
-            <div class="posicion-top me-3 fw-bold ${index === 0 ? 'text-primary' : 'text-muted'}">#${index + 1}</div>
-            <div class="flex-grow-1">
-                <h6 class="mb-0 small fw-bold text-dark">${c.nombre}</h6>
-                <small class="text-muted">${c.email}</small>
-            </div>
-            <div class="text-end">
-                <span class="fw-bold ${porEntrevista ? 'text-success' : 'text-primary'}">
-                    ${porEntrevista 
-                        ? (c.calificacion_entrevista || '--') + ' pts'
-                        : Math.round(c.match_score) + '%'}
-                </span>
-            </div>
-        </div>
-    `).join('');
-}
-
-// ===============================
-// 🔹 LOGOUT
-// ===============================
-function cerrarSesion() {
-    localStorage.removeItem('token');
-    window.location.href = "Login.html";
-}
-</script>
+        function cerrarSesion() {
+            localStorage.removeItem('token');
+            window.location.href = "Login.html";
+        }
+    </script>
 </body>
 </html>

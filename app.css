@@ -17,6 +17,11 @@
     --sombra-suave: 0 4px 15px rgba(0,0,0,0.04);
 }
 
+@font-face {
+  font-family: 'bootstrap-icons';
+  font-display: swap;
+}
+
 * {
     margin: 0;
     padding: 0;

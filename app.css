@@ -16,12 +16,10 @@
     --texto-claro: #64748b;
     --sombra-suave: 0 4px 15px rgba(0,0,0,0.04);
 }
-
 @font-face {
   font-family: 'bootstrap-icons';
   font-display: swap;
 }
-
 * {
     margin: 0;
     padding: 0;
@@ -98,19 +96,15 @@ body {
 /* =====================================================
    3. ENCABEZADOS DE LA APP (GLASSMORPHISM UNIFICADO)
 ===================================================== */
-.logo-navbar-chico, 
-.logo-navbar-vacantes, 
-.logo-navbar-agenda {
-    width: 45px;
-    height: auto;
-    object-fit: contain;
-    margin-right: 15px;
-    will-change: transform; 
-}
-
-/* Optimización global de imágenes para evitar saltos de diseño */
-img {
-    content-visibility: auto;
+.logo-navbar-chico {
+    width: 45px;           /* Tamaño ideal para la barra superior */
+    height: auto;          /* Proporción cuadrada */
+    object-fit: contain;   /* Evita que se deforme */
+    margin-right: 15px;    /* Espacio entre logo y texto */
+    
+    /* Este filtro es CLAVE: convierte tu logo a blanco para 
+       que resalte sobre el fondo azul del degradado */
+    filter: brightness(0) invert(1); 
 }
 
 /* Ajuste extra para asegurar alineación vertical */

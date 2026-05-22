@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - MarkNic AI</title>
-    <meta name="description" content="Panel de gestión de reclutamiento inteligente de MarkNica AI.">
+    <meta name="description" content="Panel de gestión de reclutamiento inteligente de MarkNic AI.">
 
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
@@ -131,7 +131,7 @@
         }
 
         function renderizarPantalla(data) {
-            document.getElementById("nombreApp").textContent = data.appNombre || "MarkNica AI";
+            document.getElementById("nombreApp").textContent = data.appNombre || "MarkNic AI";
             document.getElementById("datoCandidatos").textContent = data.candidatos || 0;
             document.getElementById("datoEntrevistas").textContent = data.proceso?.entrevistas || 0;
             document.getElementById("datoMatch").textContent = (data.match || 0) + "%";

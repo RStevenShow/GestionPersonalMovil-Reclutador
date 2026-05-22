@@ -1,6 +1,6 @@
 /* =====================================================
    APP.JS - LOGICA GLOBAL DE PWA Y NOTIFICACIONES
-   Proyecto: MarkNica AI
+   Proyecto: MarkNic AI
 ===================================================== */
 
 const API_BASE_URL = "https://reclutamiento-backend.onrender.com";

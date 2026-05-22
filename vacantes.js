@@ -1,6 +1,6 @@
 /* =====================================================
    VACANTES.JS - LOGICA DE GESTIÓN Y NAVEGACIÓN
-   Proyecto: MarkNica Recruiting AI
+   Proyecto: MarkNic Recruiting AI
 ===================================================== */
 
 const API_URL = "https://reclutamiento-backend.onrender.com";

@@ -1,7 +1,7 @@
 /**
  * =====================================================
  * SW.JS - GESTION DE NOTIFICACIONES PUSH Y CICLO DE VIDA
- * Proyecto: MarkNica Recruiting AI
+ * Proyecto: MarkNic Recruiting AI
  * Ubicacion: Raiz del proyecto (/)
  * =====================================================
  */
@@ -21,7 +21,7 @@ self.addEventListener("push", function (event) {
     console.error("Error al procesar el payload de la notificacion:", error);
   }
 
-  const title = payload.title || "Notificacion de MarkNica";
+  const title = payload.title || "Notificacion de MarkNic";
   const notificationOptions = {
     body: payload.body || "Usted tiene una nueva actualizacion en su cuenta.",
     icon: "/assets/icon-192.png",

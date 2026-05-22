@@ -1,6 +1,6 @@
 /* =====================================================
    LÓGICA DE DETALLE Y RANKING IA (MOBILE - PRODUCCIÓN)
-   Proyecto: MarkNica Recruiting AI
+   Proyecto: MarkNic Recruiting AI
 ===================================================== */
 
 const API_BASE_URL = "https://reclutamiento-backend.onrender.com";

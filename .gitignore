@@ -1,0 +1,15 @@
+# Dependencias de Node (Súper pesado, nunca se sube)
+node_modules/
+
+# Archivos de configuración local y credenciales secretas
+.env
+.env.local
+
+# Archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Historiales de compilación locales
+.gradle/
+build/
+captures/

@@ -1,0 +1,26 @@
+{
+  "name": "gestionpersonalmovil-reclutador",
+  "version": "1.0.0",
+  "description": "📱 Proyecto Gestión Personal MARKNIC – Móvil (Área de Reclutador)",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RStevenShow/GestionPersonalMovil-Reclutador.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/RStevenShow/GestionPersonalMovil-Reclutador/issues"
+  },
+  "homepage": "https://github.com/RStevenShow/GestionPersonalMovil-Reclutador#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1"
+  }
+}

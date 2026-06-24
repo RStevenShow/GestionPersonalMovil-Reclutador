@@ -1,5 +1,7 @@
 {
+ 
+  "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/Login.html" }
+    { "source": "/(.*)", "destination": "/MarkNicReclutadorAPP/$1" }
   ]
 }

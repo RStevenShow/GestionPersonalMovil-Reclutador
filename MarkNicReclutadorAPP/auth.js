@@ -296,33 +296,53 @@ if (formResetPassword) {
         }
     });
 }
-
-// --- GESTIÓN DE OLVIDAR CONTRASEÑA (Enviar correo) ---
+// --- GESTIÓN DE OLVIDAR CONTRASEÑA (Enviar correo ) ---
 const formOlvidar = document.getElementById('form-olvidar');
 
 if (formOlvidar) {
     formOlvidar.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const email = document.getElementById('recovery-email').value;
+        const email = document.getElementById('recovery-email').value.trim();
 
-        actualizarStatus('cargando', 'Enviando enlace de recuperación...');
+        actualizarStatus('cargando', 'Validando usuario...');
 
         try {
-            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-                // Esta es la URL a la que el usuario llegará al hacer clic en su correo
+            // 1. VALIDACIÓN: Consultamos a tu tabla pública si el email existe activo
+            const { data: usuario, error: errorUsuario } = await supabaseClient
+                .from('user')
+                .select('email')
+                .eq('email', email)
+                .maybeSingle(); // Devuelve null de forma limpia si no existe
+
+            if (errorUsuario) {
+                ocultarStatus();
+                mostrarError("Error al validar la cuenta en el sistema.");
+                return;
+            }
+
+            // Si el usuario dio de baja su cuenta, ya no existirá en tu tabla pública
+            if (!usuario) {
+                ocultarStatus();
+                mostrarError("El correo electrónico ingresado no está registrado o la cuenta fue dada de baja.");
+                return; // Detiene el proceso aquí y NO envía el correo
+            }
+
+            // 2. PROCESO DE SUPABASE: Si pasó la validación, procedemos a enviar el correo
+            actualizarStatus('cargando', 'Enviando enlace de recuperación...');
+
+            const { error: errorAuth } = await supabaseClient.auth.resetPasswordForEmail(email, {
                 redirectTo: 'https://gestion-personal-movil-reclutador.vercel.app/reset-password.html',
             });
 
-            if (error) {
+            if (errorAuth) {
                 ocultarStatus();
-                mostrarError(error.message);
+                mostrarError(errorAuth.message);
                 return;
             }
 
             actualizarStatus('exito', 'Enlace enviado. Revisa tu bandeja de entrada.');
 
-            // Opcional: Redirigir al login después de un momento
             setTimeout(() => {
                 window.location.href = "Login.html";
             }, 3500);

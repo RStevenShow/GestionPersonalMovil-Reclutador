@@ -14,23 +14,6 @@ function urlBase64ToUint8Array(base64String) {
   return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
 }
 
-/* --- SERVICE WORKER: Registro --- */
-async function registrarSW() {
-  if (!("serviceWorker" in navigator)) {
-    console.warn("SW no soportado");
-    return null;
-  }
-  try {
-    // Se usa la ruta relativa para asegurar que encuentre el archivo en la raiz
-    const reg = await navigator.serviceWorker.register("./sw.js");
-    console.log("SW registrado correctamente");
-    return reg;
-  } catch (err) {
-    console.error("Error al registrar SW:", err);
-    return null;
-  }
-}
-
 /* --- PUSH: Activar Notificaciones --- */
 async function activarNotificaciones() {
   try {
@@ -95,9 +78,6 @@ async function desactivarNotificaciones() {
 (function() {
   window.addEventListener("load", async () => {
     
-    // El registro del SW se dispara sin bloquear el hilo principal
-    registrarSW();
-
     const toggle = document.getElementById("switchNotificaciones");
     if (!toggle) return;
 
@@ -119,17 +99,3 @@ async function desactivarNotificaciones() {
   });
 })();
 
-
-window.addEventListener("load", () => {
-    // Usamos setTimeout para enviar el registro al final de la cola de ejecucion
-    setTimeout(async () => {
-        await registrarSW();
-        
-        const toggle = document.getElementById("switchNotificaciones");
-        if (toggle) {
-            const reg = await navigator.serviceWorker.ready;
-            const sub = await reg.pushManager.getSubscription();
-            toggle.checked = !!sub;
-        }
-    }, 100); 
-});

@@ -41,7 +41,7 @@ function configurarEventos() {
 // 3. CARGAR DATOS
 async function cargarDatosUsuario() {
     try {
-        const response = await fetch(`${API_BASE_URL}/users/me`, {
+        const response = await fetch(`${API_BASE_URL2}/users/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 

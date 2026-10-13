@@ -1,1 +1,18 @@
-<script>window.location.href = "Login.html";</script>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#3b82f6" />
+    <meta http-equiv="refresh" content="0; url=./Login.html" />
+    <title>MarkNic Recruiting AI</title>
+    <link rel="manifest" href="./manifest.json" />
+    <script src="js/pwa.js" defer></script>
+    <script>
+      window.location.replace(new URL("Login.html", window.location.href));
+    </script>
+  </head>
+  <body>
+    <p>Redirigiendo al inicio de sesión… <a href="./Login.html">Continuar</a></p>
+  </body>
+</html>
